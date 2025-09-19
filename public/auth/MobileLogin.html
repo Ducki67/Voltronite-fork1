@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voltronite</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #121212;
+        color: #fff;
+      }
+
+      .container {
+        background-color: #1f1f1f;
+        padding: 50px 40px;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 360px;
+        text-align: center;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      }
+
+      h1 {
+        margin-bottom: 30px;
+        font-weight: 600;
+        font-size: 24px;
+        color: #ffffff; /* White title */
+      }
+
+      input {
+        width: 100%; /* Full width to match button */
+        padding: 12px 15px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        border: none;
+        font-size: 16px;
+        background-color: #2a2a2a;
+        color: #fff;
+        box-sizing: border-box;
+      }
+
+      button {
+        width: 100%;
+        padding: 12px 0;
+        border: none;
+        border-radius: 8px;
+        background-color: #00aaff;
+        color: #fff;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+
+      button:active {
+        background-color: #0088cc;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Voltronite Login</h1>
+      <input type="text" id="username" placeholder="Enter your username" />
+      <button onclick="redirect()">Continue</button>
+    </div>
+
+    <script>
+      function redirect() {
+        const username = document.getElementById("username").value.trim();
+        if (!username) {
+          alert("Please enter a username");
+          return;
+        }
+        window.location.href = `com.epicgames.fortnite://authorize/?code=${encodeURIComponent(username)}`;
+      }
+    </script>
+  </body>
+</html>

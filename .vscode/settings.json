@@ -1,0 +1,18 @@
+{
+  // Use Prettier as default formatter
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // Automatically format on save
+  "editor.formatOnSave": true,
+
+  // Optional: treat TypeScript files with Bun runtime in mind
+  "typescript.tsdk": "node_modules/typescript/lib",
+
+  // Optional: disable built-in formatting for some languages if needed
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
