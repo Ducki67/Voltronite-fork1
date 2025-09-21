@@ -33,3 +33,6 @@ Bun.serve({
 });
 
 Logger.backend(`Voltronite successfully started on port ${port}`);
+
+// load external stuff
+import "./ws/matchmaker";

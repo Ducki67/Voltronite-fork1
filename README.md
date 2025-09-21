@@ -43,4 +43,4 @@ By using this software, you agree to the above terms.
 
 ## Future plans
 
-Right now this backend only has basic lobby support in the future you will be able to use cosmetics, itemshop working, matchmaking, xmpp and more... Thanks for your support and love.
+Right now this backend only has basic lobby support in the future you will be able to use cosmetics, itemshop working, xmpp and more... Thanks for your support and love.

@@ -5,6 +5,7 @@
   "private": true,
   "devDependencies": {
     "@types/bun": "latest",
+    "@types/ws": "^8.18.1",
     "prettier": "^3.6.2"
   },
   "peerDependencies": {
@@ -14,6 +15,7 @@
     "axios": "^1.12.2",
     "crypto": "^1.0.1",
     "hono": "^4.9.8",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "ws": "^8.18.3"
   }
 }
