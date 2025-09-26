@@ -9,6 +9,7 @@ Voltronite is an **OGFN backend** used to simulate or emulate Fortnite services,
 - Simulates Fortnite services for older clients
 - Simple setup and lightweight
 - Runs on [Bun](https://bun.sh) for speed and efficiency
+- Added a `Start backend.bat` file thats runs the backend with BUN to run the backend easier and faster :))
 
 ### Tested features
 - [X] Match Maker  (tested on 8.51, 10.40)
