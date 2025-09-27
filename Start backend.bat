@@ -12,46 +12,46 @@ cls
 echo.
 echo Starting ⠋
 Title= Starting Backend ⠋
-ping localhost -n 2 >nul
+ping localhost -n 1.5 >nul
 cls
 echo.
 echo Starting ⠹
 Title= Starting Backend ⠹
-ping localhost -n 2 >nul
+ping localhost -n 1.5 >nul
 cls
 echo.
 echo Starting ⠸
 Title= Starting Backend ⠸
-ping localhost -n 2 >nul
+ping localhost -n 1.5 >nul
 cls
 echo.
 echo Starting ⠼
 Title= Starting Backend ⠼
-ping localhost -n 2 >nul
+ping localhost -n 1.5 >nul
 cls
 echo.
 echo Starting ⠴
 Title= Starting Backend ⠴
-ping localhost -n 2 >nul
+ping localhost -n 1.5 >nul
 cls
 echo.
 echo Starting ⠦
 Title= Starting Backend ⠦
-ping localhost -n 2 >nul
+ping localhost -n 1.5 >nul
 cls
 echo.
 echo Starting ⠧
 Title= Starting Backend ⠧
-ping localhost -n 2 >nul
+ping localhost -n 1.3 >nul
 cls
 echo.
 echo Starting ⠇
 Title= Starting Backend ⠇
-ping localhost -n 2 >nul
+ping localhost -n 1.3 >nul
 cls
 echo.
 echo Starting ⠏
-ping localhost -n 2 >nul
+ping localhost -n 1.3 >nul
 Title=⚡▶ Backend is Up!! ◀⚡
 cls
 echo.
