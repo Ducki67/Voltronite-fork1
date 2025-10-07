@@ -12,7 +12,7 @@ cls
 echo.
 echo Starting ⠋
 Title= Starting Backend ⠋
-ping localhost -n 1 >nul
+ping localhost -n 2 >nul
 cls
 echo.
 echo Starting ⠹
@@ -22,40 +22,40 @@ cls
 echo.
 echo Starting ⠸
 Title= Starting Backend ⠸
-ping localhost -n 1 >nul
+ping localhost -n 2 >nul
 cls
 echo.
 echo Starting ⠼
 Title= Starting Backend ⠼
-ping localhost -n 1 >nul
+ping localhost -n 2 >nul
 cls
 echo.
 echo Starting ⠴
 Title= Starting Backend ⠴
-ping localhost -n 1 >nul
+ping localhost -n 2 >nul
 cls
 echo.
 echo Starting ⠦
 Title= Starting Backend ⠦
-ping localhost -n 1 >nul
+ping localhost -n 2 >nul
 cls
 echo.
 echo Starting ⠧
 Title= Starting Backend ⠧
-ping localhost -n 1 >nul
+ping localhost -n 2 >nul
 cls
 echo.
 echo Starting ⠇
 Title= Starting Backend ⠇
-ping localhost -n 1 >nul
+ping localhost -n 2 >nul
 cls
 echo.
 echo Starting ⠏
-ping localhost -n 1 >nul
+ping localhost -n 2 >nul
 Title=⚡▶ Backend is Up!! ◀⚡
 cls
 echo.
-echo 🚀⚡▶ Voltranite is Runing! ◀⚡🚀
+echo 🚀⚡▶ Voltronite is Runing! ◀⚡🚀
 echo Source here: https://github.com/RazerFrFr/Voltronite
 echo Credits: RazerFrFR
 bun run src/index.ts
