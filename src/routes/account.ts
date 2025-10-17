@@ -40,7 +40,7 @@ export default (app: Hono) => {
 
       case "password":
         if (!body.username) return c.status(400);
-        username = body.username;
+        username = body.username.split("@")[0];
         accountId = uuid().replace(/-/g, "");
         break;
 
@@ -157,12 +157,20 @@ export default (app: Hono) => {
   });
 
   app.get("/account/api/public/account/:accountId", (c) => {
-    const accountId = c.req.param("accountId");
+    const authHeader = c.req.header("Authorization");
+    if (!authHeader) return c.body(null, 401);
+
+    const tokenStr = authHeader.replace(/^Bearer\s+/i, "");
+    const data = decodeToken(tokenStr);
+    if (!data || !data.accountId) return c.body(null, 401);
+
+    const { accountId, username } = data;
+
     return c.json({
       id: accountId,
-      displayName: `user-${accountId}`,
+      displayName: username,
       name: "Voltro",
-      email: `user-${accountId}@voltronite.com`,
+      email: `${username}@voltronite.com`,
       failedLoginAttempts: 0,
       lastLogin: new Date().toISOString(),
       numberOfDisplayNameChanges: 0,

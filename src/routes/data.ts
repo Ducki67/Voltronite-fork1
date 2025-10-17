@@ -33,7 +33,7 @@ export default (app: Hono) => {
           MANIFEST: {
             signature: "Voltronite",
             distribution: "https://epicgames-download1.akamaized.net/",
-            path: "Builds/Fortnite/Content/CloudDir/mSs7lzt6QOVv6SKlOE21TcBvJU4lnw.manifest", // replace *.manifest with a valid manifest (e.g: RxwT9fhXyJWzLl0WXky5X98eJx9XfQ.manifest)
+            path: "Builds/Fortnite/Content/CloudDir/Wk2JNYbyEYzjgRo8EUm95jnwsLgKOA.manifest", // replace *.manifest with a valid manifest (e.g: RxwT9fhXyJWzLl0WXky5X98eJx9XfQ.manifest)
             additionalDistributions: [],
           },
         },
@@ -481,7 +481,7 @@ export default (app: Hono) => {
   // lightswitch
   app.get("/lightswitch/api/service/Fortnite/status", (c) =>
     c.json({
-      serviceInstanceId: "fortnite",
+      serviceInstanceId: c.req.query("serviceId") || "fortnite",
       status: "UP",
       message: "Fortnite is online",
       maintenanceUri: null,
@@ -489,7 +489,7 @@ export default (app: Hono) => {
       allowedActions: [],
       banned: false,
       launcherInfoDTO: {
-        appName: "Fortnite",
+        appName: c.req.query("serviceId") || "Fortnite",
         catalogItemId: "4fe75bbc5a674f4f9b356b5c90567da5",
         namespace: "fn",
       },
@@ -499,7 +499,7 @@ export default (app: Hono) => {
   app.get("/lightswitch/api/service/bulk/status", (c) =>
     c.json([
       {
-        serviceInstanceId: "fortnite",
+        serviceInstanceId: c.req.query("serviceId") || "fortnite",
         status: "UP",
         message: "fortnite is up.",
         maintenanceUri: null,
@@ -507,7 +507,7 @@ export default (app: Hono) => {
         allowedActions: ["PLAY", "DOWNLOAD"],
         banned: false,
         launcherInfoDTO: {
-          appName: "Fortnite",
+          appName: c.req.query("serviceId") || "Fortnite",
           catalogItemId: "4fe75bbc5a674f4f9b356b5c90567da5",
           namespace: "fn",
         },
