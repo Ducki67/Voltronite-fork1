@@ -1,11 +1,64 @@
 import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
 import { v4 as uuid } from "uuid";
+import qs from "qs";
+import { sendError } from "../utils/senderror";
 
 export default (app: Hono) => {
   app.get("/fortnite/api/game/v2/matchmakingservice/ticket/player/*", (c) => {
-    // thx lawin for the idea
-    setCookie(c, "buildUniqueId", c.req.query("bucketId")!.split(":")[0] || "");
+    const bucketId = c.req.query("bucketId");
+    if (bucketId) setCookie(c, "buildUniqueId", bucketId.split(":")[0] || "");
+
+    const mmCode = qs.parse(c.req.url.split("?")[1]!, {
+      ignoreQueryPrefix: true,
+    })["player.option.customKey"];
+
+    if (!mmCode || typeof mmCode !== "string") {
+      return sendError(
+        c,
+        "errors.common.voltronite.missing_matchmaking_code",
+        "Missing IP and port in matchmaking code. Example: 192.168.1.10:7777",
+        [],
+        400,
+        undefined,
+        404
+      );
+    }
+
+    const ipPortRegex = /^(?:\d{1,3}\.){3}\d{1,3}:\d{1,5}$/;
+    if (!ipPortRegex.test(mmCode)) {
+      return sendError(
+        c,
+        "errors.common.voltronite.invalid_matchmaking_code",
+        "Invalid matchmaking code format. Expected something like 192.168.1.69:7777.",
+        [],
+        400,
+        undefined,
+        404
+      );
+    }
+
+    const [ip, portStr] = mmCode.split(":");
+    const validIP = ip?.split(".").every((n) => {
+      const num = Number(n);
+      return num >= 0 && num <= 255;
+    });
+    const port = Number(portStr);
+    const validPort = port > 0 && port <= 65535;
+
+    if (!validIP || !validPort) {
+      return sendError(
+        c,
+        "errors.common.voltronite.invalid_matchmaking_code",
+        "Invalid IP or port range in matchmaking code.",
+        [],
+        400,
+        undefined,
+        404
+      );
+    }
+
+    setCookie(c, "gameserver_ip", mmCode);
 
     return c.json({
       serviceUrl: process.env.MATCHMAKER_IP,
@@ -16,13 +69,18 @@ export default (app: Hono) => {
   });
 
   app.get("/fortnite/api/matchmaking/session/:sessionId", (c) => {
+    const mmCode = getCookie(c, "gameserver_ip");
+    const [ip, portStr] = (mmCode || "").split(":");
+    const serverAddress = ip || "";
+    const serverPort = Number(portStr) || 0;
+
     return c.json({
       id: c.req.param("sessionId"),
       ownerId: uuid().replace(/-/g, ""),
       ownerName: "[DS]fortnite-liveeugcec1c2e30ubrcore0a-z8hj-1968",
       serverName: "[DS]fortnite-liveeugcec1c2e30ubrcore0a-z8hj-1968",
-      serverAddress: process.env.GAMESERVER_IP!.split(":")[0] || "",
-      serverPort: Number(process.env.GAMESERVER_IP!.split(":")[1]),
+      serverAddress,
+      serverPort,
       maxPublicPlayers: 220,
       openPublicPlayers: 175,
       maxPrivatePlayers: 0,

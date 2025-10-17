@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { decodeToken } from "../utils/tokens";
 
 export default (app: Hono) => {
   app.post("/partyhub/graphql", async (c) => {
@@ -6,19 +7,20 @@ export default (app: Hono) => {
     try {
       body = await c.req.json();
     } catch {}
+
     const op = body.operationName || "";
 
     const authHeader = c.req.header("Authorization");
     if (!authHeader) return c.body(null, 401);
 
     const tokenStr = authHeader.replace(/^Bearer\s+/i, "");
-    const tokenRecord = global.accessTokens.find((t) => t.token === tokenStr);
+    const tokenData = decodeToken(tokenStr);
 
-    if (!tokenRecord) {
+    if (!tokenData || !tokenData.accountId || !tokenData.username) {
       return c.body(null, 401);
     }
 
-    const { accountId, username } = tokenRecord;
+    const { accountId, username } = tokenData;
 
     switch (op) {
       case "GetStatusPerService":
@@ -58,19 +60,6 @@ export default (app: Hono) => {
         });
 
       case "GetMyAccount":
-        if (!accountId || !username) {
-          return c.json(
-            {
-              GetUserAccount: {
-                __typename: "AccountQuery",
-                myAccount: null,
-                error: "errors.com.voltro.common.not_found",
-              },
-            },
-            401
-          );
-        }
-
         return c.json({
           data: {
             Account: {

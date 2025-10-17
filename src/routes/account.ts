@@ -5,22 +5,20 @@ import sdk from "../../public/responses/sdk.json";
 import fs from "fs";
 import path from "path";
 import { Logger } from "../utils/logger";
+import { encodeToken, decodeToken } from "../utils/tokens";
 
-const exchangeCodes = [] as any[];
+const exchangeCodes: any[] = [];
 
 export default (app: Hono) => {
   app.post("/account/api/oauth/token", async (c) => {
     const contentType = c.req.header("content-type") || "";
-
     let body: Record<string, any> = {};
 
     if (contentType.includes("application/json")) {
       body = await c.req.json();
     } else if (contentType.includes("application/x-www-form-urlencoded")) {
       const formData = await c.req.formData();
-      formData.forEach((value, key) => {
-        body[key] = value;
-      });
+      formData.forEach((value, key) => (body[key] = value));
     } else {
       return c.text("Unsupported content type", 415);
     }
@@ -31,7 +29,7 @@ export default (app: Hono) => {
     switch (body.grant_type) {
       case "client_credentials":
         return c.json({
-          access_token: "accesstokenwow",
+          access_token: encodeToken({ client: true }),
           expires_in: 2069,
           expires_at: "2069-01-01T00:00:00.000Z",
           token_type: "bearer",
@@ -43,49 +41,26 @@ export default (app: Hono) => {
       case "password":
         if (!body.username) return c.status(400);
         username = body.username;
-
-        let user = global.users.find((u) => u.username === username);
-        if (!user) {
-          accountId = uuid().replace(/-/g, "");
-          user = { username, accountId };
-          global.users.push(user);
-        }
-        accountId = user.accountId;
+        accountId = uuid().replace(/-/g, "");
         break;
 
       case "authorization_code":
         if (!body.code) return c.status(400);
         username = body.code;
-
-        let authUser = global.users.find((u) => u.username === username);
-        if (!authUser) {
-          accountId = uuid().replace(/-/g, "");
-          authUser = { username, accountId };
-          global.users.push(authUser);
-        }
-        accountId = authUser.accountId;
+        accountId = uuid().replace(/-/g, "");
         break;
 
       case "exchange_code":
         if (!body.exchange_code) return c.status(400);
 
-        const index = exchangeCodes.findIndex(
-          (c) => c.code === body.exchange_code
-        );
-        if (index === -1) {
+        const record = exchangeCodes.find((c) => c.code === body.exchange_code);
+        if (!record) {
           Logger.error(`Exchange code ${body.exchange_code} not found`);
           return c.status(404);
         }
 
-        const record = exchangeCodes[index];
         username = record.username;
         accountId = record.accountId;
-        exchangeCodes.splice(index, 1);
-
-        if (!global.users.find((u) => u.username === username)) {
-          global.users.push({ username, accountId });
-        }
-
         break;
 
       default:
@@ -100,9 +75,11 @@ export default (app: Hono) => {
         );
     }
 
-    if (!accountId) accountId = uuid().replace(/-/g, "");
-    const accessToken = uuid().replace(/-/g, "");
-    global.accessTokens.push({ accountId, username, token: accessToken });
+    const accessToken = encodeToken({
+      username,
+      accountId,
+      createdAt: Date.now(),
+    });
 
     return c.json({
       access_token: accessToken,
@@ -128,16 +105,13 @@ export default (app: Hono) => {
     if (!authHeader) return c.body(null, 401);
 
     const tokenStr = authHeader.replace(/^Bearer\s+/i, "");
-    const tokenRecord = global.accessTokens.find((t) => t.token === tokenStr);
+    const data = decodeToken(tokenStr);
+    if (!data || !data.accountId) return c.body(null, 401);
 
-    if (!tokenRecord) {
-      return c.body(null, 401);
-    }
-
-    const { accountId, username } = tokenRecord;
+    const { accountId, username } = data;
 
     return c.json({
-      token: "wownewrefreshtoken",
+      token: tokenStr,
       session_id: "wowsessionid",
       token_type: "bearer",
       client_id: "wowclientid",
@@ -160,12 +134,10 @@ export default (app: Hono) => {
     const response: any[] = [];
 
     const accountId = c.req.query("accountId");
-
     if (typeof accountId === "string") {
-      const user = global.users.find((u) => u.accountId === accountId);
       response.push({
         id: accountId,
-        displayName: user?.username,
+        displayName: `user-${accountId}`,
         externalAuths: {},
       });
     }
@@ -173,10 +145,9 @@ export default (app: Hono) => {
     const accountIds = c.req.queries("accountId");
     if (accountIds) {
       for (const id of accountIds) {
-        const user = global.users.find((u) => u.accountId === id);
         response.push({
-          id: accountId,
-          displayName: user?.username,
+          id,
+          displayName: `user-${id}`,
           externalAuths: {},
         });
       }
@@ -187,12 +158,11 @@ export default (app: Hono) => {
 
   app.get("/account/api/public/account/:accountId", (c) => {
     const accountId = c.req.param("accountId");
-    const user = global.users.find((u) => u.accountId === accountId);
     return c.json({
       id: accountId,
-      displayName: user?.username,
+      displayName: `user-${accountId}`,
       name: "Voltro",
-      email: user?.username + "@voltronite.com",
+      email: `user-${accountId}@voltronite.com`,
       failedLoginAttempts: 0,
       lastLogin: new Date().toISOString(),
       numberOfDisplayNameChanges: 0,
@@ -218,7 +188,7 @@ export default (app: Hono) => {
 
   app.post("/auth/v1/oauth/token", (c) => {
     return c.json({
-      access_token: "wowaccesstoken",
+      access_token: encodeToken({ oauth: true }),
       token_type: "bearer",
       expires_in: 2069,
       expires_at: "2069-01-01T00:00:00.000Z",
@@ -252,7 +222,7 @@ export default (app: Hono) => {
     return c.json({
       scope: "basic_profile friends_list openid presence",
       token_type: "bearer",
-      access_token: "wowaccesstoken",
+      access_token: encodeToken({ accountId }),
       expires_in: 2069,
       expires_at: "2069-01-01T00:00:00.000Z",
       refresh_token: "wowrefreshtoken",
@@ -266,14 +236,14 @@ export default (app: Hono) => {
     });
   });
 
-  app.get("/account/api/epicdomains/ssodomains", (c) => {
-    return c.json([
+  app.get("/account/api/epicdomains/ssodomains", (c) =>
+    c.json([
       "unrealengine.com",
       "unrealtournament.com",
       "fortnite.com",
       "epicgames.com",
-    ]);
-  });
+    ])
+  );
 
   app.post(
     "/fortnite/api/game/v2/tryPlayOnPlatform/account/:accountIdprobably",
@@ -285,47 +255,39 @@ export default (app: Hono) => {
     if (!authHeader) return c.body(null, 401);
 
     const tokenStr = authHeader.replace(/^Bearer\s+/i, "");
-    const tokenRecord = global.accessTokens.find((t) => t.token === tokenStr);
-    if (!tokenRecord) return c.body(null, 401);
+    const data = decodeToken(tokenStr);
+    if (!data || !data.accountId) return c.body(null, 401);
 
-    const { accountId, username } = tokenRecord;
-
+    const { accountId, username } = data;
     const code = uuid().replace(/-/g, "");
     const createdAt = new Date();
     const expiresInSeconds = 300;
     const expiresAt = new Date(createdAt.getTime() + expiresInSeconds * 1000);
 
-    const record = {
+    exchangeCodes.push({
       code,
       accountId,
       username,
       createdAt: createdAt.toISOString(),
       expiresAt: expiresAt.toISOString(),
-    };
-
-    exchangeCodes.push(record);
+    });
 
     setTimeout(() => {
       const index = exchangeCodes.findIndex((i) => i.code === code);
       if (index !== -1) exchangeCodes.splice(index, 1);
     }, expiresInSeconds * 1000);
 
-    return c.json({
-      code,
-      accountId,
-      expiresInSeconds,
-    });
+    return c.json({ code, accountId, expiresInSeconds });
   });
 
   app.get("/sdk/v1/*", (c) => c.json(sdk));
 
   app.get("/login", async (c) => {
     const filePath = path.join(__dirname, "../../public/auth/MobileLogin.html");
-
     try {
       const html = await fs.promises.readFile(filePath, "utf-8");
       return c.html(html);
-    } catch (err) {
+    } catch {
       return c.text("File not found", 404);
     }
   });
