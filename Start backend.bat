@@ -55,7 +55,7 @@ ping localhost -n 2 >nul
 Title=⚡▶ Backend is Up!! ◀⚡
 cls
 echo.
-echo 🚀⚡▶ Voltronite is Runing! ◀⚡🚀
+echo 🚀⚡▶ Voltranite is Runing! ◀⚡🚀
 echo Source here: https://github.com/RazerFrFr/Voltronite
 echo Credits: RazerFrFR
 bun run src/index.ts
