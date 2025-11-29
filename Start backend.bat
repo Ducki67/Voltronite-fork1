@@ -55,7 +55,9 @@ ping localhost -n 2 >nul
 Title=⚡▶ Backend is Up!! ◀⚡
 cls
 echo.
-echo 🚀⚡▶ Voltranite is Runing! ◀⚡🚀
+echo 🚀⚡▶ Voltronite is Runing! ◀⚡🚀
 echo Source here: https://github.com/RazerFrFr/Voltronite
+echo Fork: https://github.com/Ducki67/Voltronite-fork1
+echo NOTE: Matchmaker might not work for most seasons
 echo Credits: RazerFrFR
 bun run src/index.ts
