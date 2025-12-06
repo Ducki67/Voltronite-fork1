@@ -9,6 +9,7 @@ global.accessTokens ??= [];
 
 loadRoutes(app);
 
+//app.use(logger());
 app.get("/", (c) => c.text("Voltronite, Made by Razer!"));
 app.get("/unknown", (c) => c.json({}));
 app.notFound((c) => {
@@ -36,3 +37,4 @@ Logger.backend(`Voltronite successfully started on port ${port}`);
 
 // load external stuff
 import "./ws/matchmaker";
+import { logger } from "hono/logger";

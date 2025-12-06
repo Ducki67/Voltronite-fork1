@@ -78,4 +78,52 @@ export default (app: Hono) => {
   app.all("/api/v1/:accountId/device/:deviceId/channel/:channel", (c) =>
     c.body(null, 204)
   );
+
+  app.get("/fortnite/api/game/v2/br-inventory/account/:accountId", (c) =>
+    c.json({
+      stash: {
+        globalcash: 5000,
+      },
+    })
+  );
+
+  app.get("/fortnite/api/game/v2/privacy/account/:accountId", (c) =>
+    c.json({
+      accountId: c.req.param("accountId"),
+      optOutOfPublicLeaderboards: false,
+    })
+  );
+
+  app.get("/api/v1/events/Fortnite/download/:accountId", (c) =>
+    c.json({
+      player: {
+        gameId: "Fortnite",
+        accountId: c.req.param("accountId"),
+        tokens: [],
+        teams: {},
+        pendingPayouts: [],
+        pendingPenalties: {},
+        persistentScores: {},
+        groupIdentity: {},
+      },
+      events: [],
+      templates: [],
+      scores: [],
+    })
+  );
+
+  app.get("/statsproxy/api/statsv2/account/:accountId", (c) =>
+    c.json({
+      startTime: 0,
+      endTime: 999999999999999,
+      stats: {},
+      accountId: c.req.param("accountId"),
+    })
+  );
+
+  app.get("/socialban/api/public/v1/:accountId", (c) => c.body(null, 204));
+  app.get("/fortnite/api/receipts/v1/account/:accountId/receipts", (c) =>
+    c.json([])
+  );
+  app.all("/friends/api/*", (c) => c.body(null, 204));
 };

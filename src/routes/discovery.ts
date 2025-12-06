@@ -1,0 +1,259 @@
+import { Hono } from "hono";
+
+export default (app: Hono) => {
+  app.post("/api/v1/assets/Fortnite/*", (c) =>
+    c.json({
+      FortCreativeDiscoverySurface: {
+        meta: {
+          promotion: 1,
+        },
+        assets: {
+          CreativeDiscoverySurface_Frontend: {
+            meta: {
+              revision: 1,
+              headRevision: 1,
+              revisedAt: "2022-04-11T16:34:03.517Z",
+              promotion: 1,
+              promotedAt: "2022-04-11T16:34:49.510Z",
+            },
+            assetData: {
+              AnalyticsId: "t412",
+              TestCohorts: [
+                {
+                  AnalyticsId: "c522715413",
+                  CohortSelector: "PlayerDeterministic",
+                  PlatformBlacklist: [],
+                  ContentPanels: [
+                    {
+                      NumPages: 1,
+                      AnalyticsId: "p536",
+                      PanelType: "AnalyticsList",
+                      AnalyticsListName: "ByEpicWoven",
+                      CuratedListOfLinkCodes: [],
+                      ModelName: "",
+                      PageSize: 7,
+                      PlatformBlacklist: [],
+                      PanelName: "ByEpicWoven",
+                      MetricInterval: "",
+                      SkippedEntriesCount: 0,
+                      SkippedEntriesPercent: 0,
+                      SplicedEntries: [],
+                      PlatformWhitelist: [],
+                      EntrySkippingMethod: "None",
+                      PanelDisplayName: {
+                        Category: "Game",
+                        NativeCulture: "",
+                        Namespace: "CreativeDiscoverySurface_Frontend",
+                        LocalizedStrings: [
+                          {
+                            key: "ar",
+                            value: "العب بأسلوبك",
+                          },
+                          {
+                            key: "de",
+                            value: "Spiele auf deine Weise",
+                          },
+                          {
+                            key: "en",
+                            value: "Play Your Way",
+                          },
+                          {
+                            key: "es",
+                            value: "Juega como quieras",
+                          },
+                          {
+                            key: "fr",
+                            value: "Jouez à votre façon",
+                          },
+                          {
+                            key: "it",
+                            value: "Gioca a modo tuo",
+                          },
+                          {
+                            key: "ja",
+                            value: "好きにプレイしよう",
+                          },
+                          {
+                            key: "ko",
+                            value: "나만의 플레이",
+                          },
+                          {
+                            key: "pl",
+                            value: "Graj po swojemu",
+                          },
+                          {
+                            key: "ru",
+                            value: "Играйте как нравится",
+                          },
+                          {
+                            key: "tr",
+                            value: "İstediğin Gibi Oyna",
+                          },
+                          {
+                            key: "pt-BR",
+                            value: "Jogue do Seu Jeito",
+                          },
+                          {
+                            key: "es-419",
+                            value: "Juega a tu manera",
+                          },
+                        ],
+                        bIsMinimalPatch: false,
+                        NativeString: "Play Your Way",
+                        Key: "ByEpicWoven",
+                      },
+                      PlayHistoryType: "RecentlyPlayed",
+                      bLowestToHighest: false,
+                      PanelLinkCodeBlacklist: [],
+                      PanelLinkCodeWhitelist: [],
+                      FeatureTags: [],
+                      MetricName: "",
+                    },
+                  ],
+                  PlatformWhitelist: [],
+                  SelectionChance: 0.1,
+                  TestName: "Voltronite",
+                },
+              ],
+              GlobalLinkCodeBlacklist: [],
+              SurfaceName: "CreativeDiscoverySurface_Frontend",
+              TestName: "20.10_4/11/2022_hero_combat_popularConsole",
+              primaryAssetId:
+                "FortCreativeDiscoverySurface:CreativeDiscoverySurface_Frontend",
+              GlobalLinkCodeWhitelist: [],
+            },
+          },
+        },
+      },
+    })
+  );
+
+  app.post("/fortnite/api/game/v2/creative/discovery/surface/:accountId", (c) =>
+    c.json({
+      Panels: [
+        {
+          PanelName: "ByEpicWoven",
+          Pages: [
+            {
+              results: [
+                {
+                  linkData: {
+                    namespace: "fn",
+                    mnemonic: "playlist_defaultsolo",
+                    linkType: "BR:Playlist",
+                    active: true,
+                    disabled: false,
+                    version: 95,
+                    moderationStatus: "Unmoderated",
+                    accountId: "epic",
+                    creatorName: "Epic",
+                    descriptionTags: [],
+                    metadata: {
+                      image_url:
+                        "https://cdn2.unrealengine.com/solo-1920x1080-1920x1080-bc0a5455ce20.jpg",
+                      matchmaking: {
+                        override_playlist: "playlist_defaultsolo",
+                      },
+                    },
+                  },
+                  lastVisited: null,
+                  linkCode: "playlist_defaultsolo",
+                  isFavorite: false,
+                },
+                {
+                  linkData: {
+                    namespace: "fn",
+                    mnemonic: "playlist_defaultduo",
+                    linkType: "BR:Playlist",
+                    active: true,
+                    disabled: false,
+                    version: 95,
+                    moderationStatus: "Unmoderated",
+                    accountId: "epic",
+                    creatorName: "Epic",
+                    descriptionTags: [],
+                    metadata: {
+                      image_url:
+                        "https://cdn2.unrealengine.com/duos-1920x1080-1920x1080-5a411fe07b21.jpg",
+                      matchmaking: {
+                        override_playlist: "playlist_defaultduo",
+                      },
+                    },
+                  },
+                  lastVisited: null,
+                  linkCode: "playlist_defaultduo",
+                  isFavorite: false,
+                },
+                {
+                  linkData: {
+                    namespace: "fn",
+                    mnemonic: "playlist_trios",
+                    linkType: "BR:Playlist",
+                    active: true,
+                    disabled: false,
+                    version: 95,
+                    moderationStatus: "Unmoderated",
+                    accountId: "epic",
+                    creatorName: "Epic",
+                    descriptionTags: [],
+                    metadata: {
+                      image_url:
+                        "https://cdn2.unrealengine.com/trios-1920x1080-1920x1080-d5054bb9691a.jpg",
+                      matchmaking: {
+                        override_playlist: "playlist_trios",
+                      },
+                    },
+                  },
+                  lastVisited: null,
+                  linkCode: "playlist_trios",
+                  isFavorite: false,
+                },
+                {
+                  linkData: {
+                    namespace: "fn",
+                    mnemonic: "playlist_defaultsquad",
+                    linkType: "BR:Playlist",
+                    active: true,
+                    disabled: false,
+                    version: 95,
+                    moderationStatus: "Unmoderated",
+                    accountId: "epic",
+                    creatorName: "Epic",
+                    descriptionTags: [],
+                    metadata: {
+                      image_url:
+                        "https://cdn2.unrealengine.com/squads-1920x1080-1920x1080-095c0732502e.jpg",
+                      matchmaking: {
+                        override_playlist: "playlist_defaultsquad",
+                      },
+                    },
+                  },
+                  lastVisited: null,
+                  linkCode: "playlist_defaultsquad",
+                  isFavorite: false,
+                },
+              ],
+              hasMore: false,
+            },
+          ],
+        },
+      ],
+      TestCohorts: ["Voltronite"],
+      ModeSets: {},
+    })
+  );
+
+  app.get("/fortnite/api/game/v2/creative/favorites/:accountId", (c) =>
+    c.json({
+      results: [],
+      hasMore: false,
+    })
+  );
+
+  app.get("/fortnite/api/game/v2/creative/history/:accountId", (c) =>
+    c.json({
+      results: [],
+      hasMore: false,
+    })
+  );
+};

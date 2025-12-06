@@ -33,7 +33,7 @@ export default (app: Hono) => {
           MANIFEST: {
             signature: "Voltronite",
             distribution: "https://epicgames-download1.akamaized.net/",
-            path: "Builds/Fortnite/Content/CloudDir/Wk2JNYbyEYzjgRo8EUm95jnwsLgKOA.manifest", // replace *.manifest with a valid manifest (e.g: RxwT9fhXyJWzLl0WXky5X98eJx9XfQ.manifest)
+            path: "Builds/Fortnite/Content/CloudDir/MpLk_vMfcRflZaV62UGbtZMWTmmPVg.manifest", // replace *.manifest with a valid manifest (e.g: RxwT9fhXyJWzLl0WXky5X98eJx9XfQ.manifest)
             additionalDistributions: [],
           },
         },
@@ -385,98 +385,10 @@ export default (app: Hono) => {
     }
   });
 
-  app.get("/fortnite/api/cloudstorage/user/:accountId", (c) => {
-    const accountId = c.req.param("accountId");
-
-    try {
-      const clientPath = path.join(
-        __dirname,
-        "../../public/usersettings/",
-        accountId
-      );
-      if (!fs.existsSync(clientPath))
-        fs.mkdirSync(clientPath, { recursive: true });
-
-      let csFiles: any[] = [];
-
-      fs.readdirSync(clientPath).forEach((name) => {
-        if (!name.toLowerCase().includes("clientsettings")) return;
-
-        const filePath = path.join(clientPath, name);
-        const ParsedFile = fs.readFileSync(filePath, "latin1");
-        const ParsedStats = fs.statSync(filePath);
-
-        csFiles.push({
-          uniqueFilename: name,
-          filename: name,
-          hash: crypto.createHash("sha1").update(ParsedFile).digest("hex"),
-          hash256: crypto.createHash("sha256").update(ParsedFile).digest("hex"),
-          length: Buffer.byteLength(ParsedFile),
-          contentType: "application/octet-stream",
-          uploaded: ParsedStats.mtime,
-          storageType: "S3",
-          storageIds: {},
-          accountId: accountId,
-          doNotCache: false,
-        });
-      });
-
-      return c.json(csFiles);
-    } catch (err) {
-      return c.text("Internal Server Error", 500);
-    }
-  });
-
-  app.put(
-    "/fortnite/api/cloudstorage/user/:accountId/:file",
-
-    async (c) => {
-      const accountId = c.req.param("accountId");
-      const fileParam = c.req.param("file");
-
-      try {
-        const clientPath = path.join(
-          __dirname,
-          "../../public/usersettings/",
-          accountId
-        );
-        if (!fs.existsSync(clientPath))
-          fs.mkdirSync(clientPath, { recursive: true });
-
-        if (!fileParam.toLowerCase().includes("clientsettings"))
-          return c.text("File is not a valid ClientSettings file", 400);
-
-        const filePath = path.join(clientPath, fileParam);
-        const body = await c.req.arrayBuffer();
-        fs.writeFileSync(filePath, Buffer.from(body), "latin1");
-
-        return c.json([]);
-      } catch (err) {
-        return c.text("Internal Server Error", 500);
-      }
-    }
+  app.get("/fortnite/api/cloudstorage/user/:accountId", (c) => c.json([]));
+  app.put("/fortnite/api/cloudstorage/user/:accountId/:file", (c) =>
+    c.body(null, 204)
   );
-
-  app.get("/fortnite/api/cloudstorage/user/:accountId/:file", (c) => {
-    const accountId = c.req.param("accountId");
-    const fileParam = c.req.param("file");
-
-    const clientPath = path.join(
-      __dirname,
-      "../../public/usersettings/",
-      accountId
-    );
-    if (!fs.existsSync(clientPath))
-      fs.mkdirSync(clientPath, { recursive: true });
-
-    if (!fileParam.toLowerCase().includes("clientsettings")) return c.json([]);
-
-    const filePath = path.join(clientPath, fileParam);
-    if (fs.existsSync(filePath))
-      return c.body(fs.readFileSync(filePath) as any);
-
-    return c.json([]);
-  });
 
   // lightswitch
   app.get("/lightswitch/api/service/Fortnite/status", (c) =>
