@@ -161,4 +161,11 @@ export default (app: Hono) => {
   app.all("/api/content/v2/launch-data", (c) => c.body(null, 204));
   app.all("/fortnite/api/feedback/Error", (c) => c.body(null, 204));
   app.get("/api/v1/access/fortnite/*", (c) => c.body(null, 204));
+  app.get(
+    "/eulatracking/api/public/agreements/FortniteMobileAndroid/account/:accountId",
+    (c) => c.body(null, 204)
+  );
+  app.all("/fortnite/api/game/v2/friendcodes/:accountId/epic", (c) =>
+    c.json({})
+  );
 };

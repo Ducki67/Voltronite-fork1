@@ -42,6 +42,7 @@ export default (app: Hono) => {
           case "SetLoadoutShuffleEnabled":
           case "SetCosmeticLockerSlots":
           case "SetRandomCosmeticLoadoutFlag":
+          case "ClaimMfaEnabled":
             changes.push({ changeType: "fullProfileUpdate", profile });
             break;
 
@@ -260,6 +261,130 @@ export default (app: Hono) => {
             profile.commandRevision = (profile.commandRevision || 0) + 1;
 
             await saveLoadout(accountId, profile);
+            changes.push({ changeType: "fullProfileUpdate", profile });
+            break;
+          }
+
+          case "EquipBattleRoyaleCustomization": {
+            const body = await c.req.json<{
+              itemToSlot: string;
+              slotName: string;
+              indexWithinSlot?: number;
+              variantUpdates?: { channel: string; active: string }[];
+            }>();
+
+            let statChanged = false;
+            let variantChanged = false;
+            if (body.variantUpdates?.length) {
+              const item = profile.items[body.itemToSlot];
+              if (
+                !item.attributes.variants ||
+                item.attributes.variants.length === 0
+              ) {
+                item.attributes.variants = body.variantUpdates;
+              } else {
+                for (let i = 0; i < item.attributes.variants.length; i++) {
+                  try {
+                    if (
+                      item.attributes.variants[i].channel.toLowerCase() ===
+                      body.variantUpdates[i]!.channel.toLowerCase()
+                    ) {
+                      item.attributes.variants[i].active =
+                        body.variantUpdates[i]!.active;
+                    }
+                  } catch {}
+                }
+              }
+              variantChanged = true;
+            }
+
+            const slot = body.slotName;
+            switch (slot) {
+              case "Character":
+              case "Backpack":
+              case "Pickaxe":
+              case "Glider":
+              case "SkyDiveContrail":
+              case "MusicPack":
+              case "LoadingScreen":
+                profile.stats.attributes[`favorite_${slot.toLowerCase()}`] =
+                  body.itemToSlot || "";
+                statChanged = true;
+                break;
+
+              case "Dance": {
+                const i = body.indexWithinSlot ?? 0;
+                if (i >= 0) {
+                  profile.stats.attributes.favorite_dance[i] =
+                    body.itemToSlot || "";
+                }
+                statChanged = true;
+                break;
+              }
+
+              case "ItemWrap": {
+                const i = body.indexWithinSlot ?? 0;
+                if (i >= 0) {
+                  profile.stats.attributes.favorite_itemwraps[i] =
+                    body.itemToSlot || "";
+                } else {
+                  for (let j = 0; j < 7; j++) {
+                    profile.stats.attributes.favorite_itemwraps[j] =
+                      body.itemToSlot || "";
+                  }
+                }
+                statChanged = true;
+                break;
+              }
+            }
+
+            if (statChanged) {
+              const category = `favorite_${slot.toLowerCase()}${
+                slot === "ItemWrap" ? "s" : ""
+              }`;
+
+              profile.rvn++;
+              profile.commandRevision++;
+
+              changes.push({
+                changeType: "statModified",
+                name: category,
+                value: profile.stats.attributes[category],
+              });
+
+              if (variantChanged) {
+                changes.push({
+                  changeType: "itemAttrChanged",
+                  itemId: body.itemToSlot,
+                  attributeName: "variants",
+                  attributeValue:
+                    profile.items[body.itemToSlot].attributes.variants,
+                });
+              }
+
+              await saveAthena(accountId, profile);
+            }
+
+            changes.push({ changeType: "fullProfileUpdate", profile });
+            break;
+          }
+
+          case "SetBattleRoyaleBanner": {
+            const body = await c.req.json<{
+              homebaseBannerIconId: string;
+              homebaseBannerColorId: string;
+            }>();
+
+            const icon = body.homebaseBannerIconId;
+            const color = body.homebaseBannerColorId;
+
+            profile.stats.attributes.banner_icon = icon;
+            profile.stats.attributes.banner_color = color;
+
+            profile.rvn = (profile.rvn || 0) + 1;
+            profile.commandRevision = (profile.commandRevision || 0) + 1;
+
+            await saveAthena(accountId, profile);
             changes.push({ changeType: "fullProfileUpdate", profile });
             break;
           }

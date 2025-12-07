@@ -40,19 +40,13 @@ services, allowing connections on older versions of the game.
 Voltronite currently provides multi-chapter Fortnite support with
 varying levels of stability and feature completeness:
 
-### ✔️ Fully Supported & Stable
+### ✔️ Support for Chapters
 
+- **Chapter 1** --- Fully working (tested on 7.40)
+- **Chapter 2** --- Working but limited testing.
 - **Chapter 3** --- Fully working (tested on 19.10)
 - **Chapter 4** --- Fully working, except some matchmaking limitations on some version. (Tested on 23.50 and 27.11)
 - **Chapter 5** --- Fully working (tested on 28.30)
-
-### ⚠️ Partially Supported
-
-- **Chapter 2** --- Fully working but with limited testing.
-
-### 🔬 Experimental
-
-- **Chapter 1** --- Not fully tested yet; and missing some mcp operations.
 
 ---
 

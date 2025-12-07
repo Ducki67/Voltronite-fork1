@@ -84,7 +84,7 @@ export default (app: Hono) => {
             {
               hidden: false,
               _type: "CommonUI Simple Message Base",
-              body: "Made by Razer. \nDiscord: https://discord.gg/nz4sReTEWq",
+              body: "Made by Razer. \nDiscord: https://discord.gg/e3ggRHrtrc",
               title: "Voltronite",
               spotlight: false,
             },
@@ -109,7 +109,7 @@ export default (app: Hono) => {
               hidden: false,
               _type: "CommonUI Emergency Notice Base",
               title: "Voltronite",
-              body: "Made by Razer. \nDiscord: https://discord.gg/nz4sReTEWq",
+              body: "Made by Razer. \nDiscord: https://discord.gg/e3ggRHrtrc",
             },
           ],
         },
@@ -123,14 +123,14 @@ export default (app: Hono) => {
           motds: [
             {
               entryType: "Website",
-              image: "http://192.168.1.69:8080/motd/images/motd.png",
-              tileImage: "http://192.168.1.69:8080/motd/images/motd_tile.png",
+              image: "https://i.imgur.com/lJVudDn.png",
+              tileImage: "https://i.imgur.com/1N6teHV.png",
               videoMute: false,
               hidden: false,
               tabTitleOverride: "VoltroNite",
               _type: "CommonUI Simple Message MOTD",
               title: "Voltronite",
-              body: "Made by Razer. \nDiscord: https://discord.gg/nz4sReTEWq",
+              body: "Made by Razer. \nDiscord: https://discord.gg/e3ggRHrtrc",
               videoLoop: false,
               videoStreamingEnabled: false,
               sortingPriority: 0,
@@ -138,14 +138,25 @@ export default (app: Hono) => {
               videoAutoplay: false,
               videoFullscreen: false,
               spotlight: false,
-              websiteURL: "https://discord.gg/nz4sReTEWq",
+              websiteURL: "https://discord.gg/e3ggRHrtrc",
               websiteButtonText: "Join our discord",
+            },
+          ],
+          messages: [
+            {
+              image: "https://i.imgur.com/lJVudDn.png",
+              hidden: false,
+              messagetype: "normal",
+              _type: "CommonUI Simple Message Base",
+              title: "Voltronite",
+              body: "Made by Razer.\nDiscord: https://discord.gg/e3ggRHrtrc",
+              spotlight: false,
             },
           ],
         },
         _title: "battleroyalenews",
         header: "",
-        style: "None",
+        style: "SpecialEvent",
         _noIndex: false,
         alwaysShow: false,
         _activeDate: "2018-08-17T16:00:00.000Z",
@@ -156,14 +167,14 @@ export default (app: Hono) => {
         news: [
           {
             entryType: "Website",
-            image: "http://192.168.1.69:8080/motd/images/motd.png",
-            tileImage: "http://192.168.1.69:8080/motd/images/motd_tile.png",
+            image: "https://i.imgur.com/lJVudDn.png",
+            tileImage: "https://i.imgur.com/1N6teHV.png",
             videoMute: false,
             hidden: false,
             tabTitleOverride: "VoltroNite",
             _type: "CommonUI Simple Message MOTD",
             title: "Voltronite",
-            body: "Made by Razer. \nDiscord: https://discord.gg/nz4sReTEWq",
+            body: "Made by Razer. \nDiscord: https://discord.gg/e3ggRHrtrc",
             videoLoop: false,
             videoStreamingEnabled: false,
             sortingPriority: 0,
@@ -171,7 +182,7 @@ export default (app: Hono) => {
             videoAutoplay: false,
             videoFullscreen: false,
             spotlight: false,
-            websiteURL: "https://discord.gg/nz4sReTEWq",
+            websiteURL: "https://discord.gg/e3ggRHrtrc",
             websiteButtonText: "Join our discord",
           },
         ],
@@ -439,25 +450,25 @@ export default (app: Hono) => {
                 {
                   width: 1920,
                   height: 1080,
-                  url: "http://192.168.1.69:8080/motd/images/motd.png",
+                  url: "https://i.imgur.com/lJVudDn.png",
                 },
                 {
                   width: 960,
                   height: 540,
-                  url: "http://192.168.1.69:8080/motd/images/motd.png",
+                  url: "https://i.imgur.com/lJVudDn.png",
                 },
               ],
               _type: "FullScreenBackground",
             },
             FullScreenBody:
-              "Made by Razer\nDiscord: https://discord.gg/nz4sReTEWq",
+              "Made by Razer\nDiscord: https://discord.gg/e3ggRHrtrc",
             FullScreenTitle: "Voltronite",
             TeaserBackground: {
               Image: [
                 {
                   width: 1024,
                   height: 512,
-                  url: "http://192.168.1.69:8080/motd/images/motd.png",
+                  url: "https://i.imgur.com/lJVudDn.png",
                 },
               ],
               _type: "TeaserBackground",
@@ -586,21 +597,4 @@ export default (app: Hono) => {
       },
     ])
   );
-
-  // MOTD wow
-  app.get("/motd/images/:filename", async (c) => {
-    const filename = c.req.param("filename");
-    const filePath = path.join("./public/motd/", filename);
-
-    try {
-      await fs.promises.access(filePath);
-      return c.newResponse(fs.createReadStream(filePath) as any, {
-        headers: {
-          "Content-Type": "image/png",
-        },
-      });
-    } catch {
-      return c.text("Image not found", 404);
-    }
-  });
 };
