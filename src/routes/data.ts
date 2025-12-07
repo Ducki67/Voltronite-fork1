@@ -46,7 +46,7 @@ export default (app: Hono) => {
           MANIFEST: {
             signature: "Voltronite",
             distribution: "https://epicgames-download1.akamaized.net/",
-            path: "Builds/Fortnite/Content/CloudDir/MpLk_vMfcRflZaV62UGbtZMWTmmPVg.manifest", // replace *.manifest with a valid manifest (e.g: RxwT9fhXyJWzLl0WXky5X98eJx9XfQ.manifest)
+            path: "Builds/Fortnite/Content/CloudDir/MsLPrbifCpWz-2JnL0KySgGuvnwL9Q.manifest", // replace *.manifest with a valid manifest (e.g: RxwT9fhXyJWzLl0WXky5X98eJx9XfQ.manifest)
             additionalDistributions: [],
           },
         },
@@ -55,12 +55,25 @@ export default (app: Hono) => {
   );
 
   // ContentPages/MOTD stuff
-  app.get("/content/api/pages/fortnite-game/*", async (c) => {
+  app.get("/content/api/pages/fortnite-game/spark-tracks", async (c) => {
+    try {
+      const sparkTracks: any = await axios.get(
+        "https://fortnitecontent-website-prod07.ol.epicgames.com/content/api/pages/fortnite-game/spark-tracks"
+      );
+
+      return c.json(sparkTracks.data);
+    } catch {
+      c.text("Failed to fetch tracks.", 500);
+    }
+  });
+
+  async function handleFortniteGame(c: any) {
     const version = GetVersionInfo(c.req);
-    const game: any = await axios.get(
+
+    const game = await axios.get(
       "https://fortnitecontent-website-prod07.ol.epicgames.com/content/api/pages/fortnite-game"
     );
-    let contentpages: any = game.data;
+    let contentpages = game.data;
 
     contentpages = Object.assign(contentpages, {
       emergencynotice: {
@@ -140,37 +153,34 @@ export default (app: Hono) => {
         _locale: "en-US",
       },
       battleroyalenewsv2: {
-        news: {
-          motds: [
-            {
-              entryType: "Website",
-              image: "http://192.168.1.69:8080/motd/images/motd.png",
-              tileImage: "http://192.168.1.69:8080/motd/images/motd_tile.png",
-              videoMute: false,
-              hidden: false,
-              tabTitleOverride: "VoltroNite",
-              _type: "CommonUI Simple Message MOTD",
-              title: "Voltronite",
-              body: "Made by Razer. \nDiscord: https://discord.gg/nz4sReTEWq",
-              videoLoop: false,
-              videoStreamingEnabled: false,
-              sortingPriority: 0,
-              id: "VoltMOTD",
-              videoAutoplay: false,
-              videoFullscreen: false,
-              spotlight: false,
-              websiteURL: "https://discord.gg/nz4sReTEWq",
-              websiteButtonText: "Join our discord",
-            },
-          ],
-        },
+        news: [
+          {
+            entryType: "Website",
+            image: "http://192.168.1.69:8080/motd/images/motd.png",
+            tileImage: "http://192.168.1.69:8080/motd/images/motd_tile.png",
+            videoMute: false,
+            hidden: false,
+            tabTitleOverride: "VoltroNite",
+            _type: "CommonUI Simple Message MOTD",
+            title: "Voltronite",
+            body: "Made by Razer. \nDiscord: https://discord.gg/nz4sReTEWq",
+            videoLoop: false,
+            videoStreamingEnabled: false,
+            sortingPriority: 0,
+            id: "VoltMOTD",
+            videoAutoplay: false,
+            videoFullscreen: false,
+            spotlight: false,
+            websiteURL: "https://discord.gg/nz4sReTEWq",
+            websiteButtonText: "Join our discord",
+          },
+        ],
         "jcr:isCheckedOut": true,
         _title: "battleroyalenewsv2",
         header: "",
         style: "None",
         _noIndex: false,
         alwaysShow: false,
-        "jcr:baseVersion": "a7ca237317f1e704b1a186-6846-4eaa-a542-c2c8ca7e7f29",
         _activeDate: "2020-01-21T14:00:00.000Z",
         lastModified: "2021-02-10T23:57:48.837Z",
         _locale: "en-US",
@@ -179,8 +189,7 @@ export default (app: Hono) => {
 
     const playlist = contentpages.playlistinformation?.playlist_info?.playlists;
     if (playlist) {
-      for (let i = 0; i < playlist.length; i++) {
-        const pl = playlist[i];
+      for (const pl of playlist) {
         if (
           pl.image ===
             "https://cdn2.unrealengine.com/Fortnite/fortnite-game/playlistinformation/v12/12BR_Cyclone_Astronomical_PlaylistTile_Main-1024x512-ab95f8d30d0742ba1759403320a08e4ea6f0faa0.jpg" &&
@@ -213,26 +222,21 @@ export default (app: Hono) => {
         case 10:
           bg.stage = "seasonx";
           break;
-
         case 11:
           bg.stage =
             version.build === 11.31 || version.build === 11.4
               ? "Winter19"
               : "season11";
           break;
-
         case 12:
           bg.stage = "season12";
           break;
-
         case 13:
           bg.stage = "season13";
           break;
-
         case 14:
           bg.stage = "season14";
           break;
-
         case 15:
           bg.stage = "season15";
           if (version.build === 15.1) {
@@ -241,19 +245,15 @@ export default (app: Hono) => {
               "XmasStore2020";
           }
           break;
-
         case 16:
           bg.stage = "season16";
           break;
-
         case 17:
           bg.stage = "season17";
           break;
-
         case 18:
           bg.stage = "season18";
           break;
-
         case 19:
           bg.stage = version.build === 19.01 ? "winter2021" : "season19";
           bg.backgroundimage =
@@ -261,7 +261,6 @@ export default (app: Hono) => {
               ? "https://cdn2.unrealengine.com/t-bp19-lobby-xmas-2048x1024-f85d2684b4af.png"
               : "";
           break;
-
         case 20:
           bg.stage = "season20";
           bg.backgroundimage =
@@ -269,7 +268,6 @@ export default (app: Hono) => {
               ? "https://cdn2.unrealengine.com/t-bp20-40-armadillo-glowup-lobby-2048x2048-2048x2048-3b83b887cc7f.jpg"
               : "https://cdn2.unrealengine.com/s20-landscapev4-2048x1024-2494a103ae6c.png";
           break;
-
         case 21:
           bg.stage = version.build === 21.3 ? "season2130" : "season2100";
           bg.backgroundimage =
@@ -277,12 +275,10 @@ export default (app: Hono) => {
               ? "https://cdn2.unrealengine.com/nss-lobbybackground-2048x1024-f74a14565061.jpg"
               : "https://cdn2.unrealengine.com/s21-lobby-background-2048x1024-2e7112b25dc3.jpg";
           break;
-
         case 22:
           bg.backgroundimage =
             "https://cdn2.unrealengine.com/t-bp22-lobby-square-2048x2048-2048x2048-e4e90c6e8018.jpg";
           break;
-
         case 23:
           if (version.build === 23.1) {
             bg.backgroundimage =
@@ -293,19 +289,16 @@ export default (app: Hono) => {
               "https://cdn2.unrealengine.com/t-bp23-lobby-2048x1024-2048x1024-26f2c1b27f63.png";
           }
           break;
-
         case 24:
           bg.stage = "defaultnotris";
           bg.backgroundimage =
             "https://static.wikia.nocookie.net/fortnite/images/e/e7/Chapter_4_Season_2_-_Lobby_Background_-_Fortnite.png";
           break;
-
         case 25:
           bg.stage = "defaultnotris";
           bg.backgroundimage =
             "https://static.wikia.nocookie.net/fortnite/images/c/ca/Chapter_4_Season_3_-_Lobby_Background_-_Fortnite.png";
           break;
-
         case 26:
           if (version.build === 26.3) {
             bg.stage = "season2630";
@@ -317,7 +310,6 @@ export default (app: Hono) => {
               "https://cdn2.unrealengine.com/0814-ch4s4-lobby-2048x1024-2048x1024-e3c2cf8d342d.png";
           }
           break;
-
         case 27:
           if (version.build === 27.11) {
             bg.stage = "defaultnotris";
@@ -327,7 +319,6 @@ export default (app: Hono) => {
             bg.stage = "season2700";
           }
           break;
-
         case 28:
           if (version.build === 28.2) {
             bg.stage = "defaultnotris";
@@ -339,7 +330,6 @@ export default (app: Hono) => {
               "https://cdn2.unrealengine.com/ch5s1-lobbybg-3640x2048-0974e0c3333c.jpg";
           }
           break;
-
         default:
           bg.stage = "defaultnotris";
           break;
@@ -413,7 +403,10 @@ export default (app: Hono) => {
     };
 
     return c.json(contentpages);
-  });
+  }
+
+  app.get("/content/api/pages/fortnite-game", handleFortniteGame);
+  app.get("/content/api/pages/fortnite-game/", handleFortniteGame);
 
   app.post("/api/v1/fortnite-br/surfaces/*/target", async (c) => {
     return c.json({

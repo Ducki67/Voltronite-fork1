@@ -90,7 +90,7 @@ export default (app: Hono) => {
       expires_in: 2067,
       expires_at: "2067-01-01T00:00:00.000Z",
       token_type: "bearer",
-      refresh_token: "wowrefreshtoken",
+      refresh_token: accessToken,
       refresh_expires: 2069,
       refresh_expires_at: "2069-01-01T00:00:00.000Z",
       account_id: accountId,

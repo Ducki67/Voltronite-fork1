@@ -126,4 +126,39 @@ export default (app: Hono) => {
     c.json([])
   );
   app.all("/friends/api/*", (c) => c.body(null, 204));
+
+  app.get("/hotconfigs/v2/livefn.json", (c) =>
+    c.json({
+      HotConfigData: [
+        {
+          AppId: "livefn",
+          EpicApp: "FortniteLivefn",
+          Modules: [
+            {
+              ModuleName: "GameServiceMcp",
+              Endpoints: {
+                Android: "mcp-gc.live.fngw.ol.epicgames.com",
+                DedicatedServer: "mcp-ds.live.fngw.ol.epicgames.com",
+                Default: "mcp-gc.live.fngw.ol.epicgames.com",
+                IOS: "mcp-gc.live.fngw.ol.epicgames.com",
+                Linux: "mcp-gc.live.fngw.ol.epicgames.com",
+                Mac: "mcp-gc.live.fngw.ol.epicgames.com",
+                PS4: "mcp-gc.live.fngw.ol.epicgames.com",
+                PS5: "mcp-gc.live.fngw.ol.epicgames.com",
+                Switch: "mcp-gc.live.fngw.ol.epicgames.com",
+                Windows: "mcp-gc.live.fngw.ol.epicgames.com",
+                XB1: "mcp-gc.live.fngw.ol.epicgames.com",
+                XSX: "mcp-gc.live.fngw.ol.epicgames.com",
+                XboxOneGDK: "mcp-gc.live.fngw.ol.epicgames.com",
+              },
+            },
+          ],
+        },
+      ],
+    })
+  );
+
+  app.all("/api/content/v2/launch-data", (c) => c.body(null, 204));
+  app.all("/fortnite/api/feedback/Error", (c) => c.body(null, 204));
+  app.get("/api/v1/access/fortnite/*", (c) => c.body(null, 204));
 };

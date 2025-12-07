@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { v4 as uuid } from "uuid";
 import sdk from "../../public/responses/sdk.json";
-import { encodeToken } from "../utils/tokens";
+import { decodeToken, encodeToken } from "../utils/tokens";
 
 export default (app: Hono) => {
   app.get("/sdk/v1/*", (c) => c.json(sdk));
@@ -37,8 +37,14 @@ export default (app: Hono) => {
     ]);
   });
 
-  app.post("/epic/oauth/v2/token", (c) => {
-    const accountId = uuid().replace(/-/g, "");
+  app.post("/epic/oauth/v2/token", async (c) => {
+    const body = await c.req.formData();
+    const refresh_token = body.get("refresh_token");
+    if (!refresh_token) {
+      return c.json({ error: "Missing refresh_token" }, 400);
+    }
+    const { accountId } = decodeToken(refresh_token.toString());
+
     return c.json({
       scope: "basic_profile friends_list openid presence",
       token_type: "bearer",
@@ -48,7 +54,7 @@ export default (app: Hono) => {
       refresh_token: "wowrefreshtoken",
       refresh_expires_in: 2067,
       refresh_expires_at: "2067-01-01T00:00:00.000Z",
-      accountId,
+      account_id: accountId,
       client_id: "wowclientid",
       application_id: "wowappid",
       selected_account_id: accountId,
@@ -108,7 +114,7 @@ export default (app: Hono) => {
     })
   );
 
-  app.post("/publickey/v1/publickey/", (c) => c.json([]));
+  app.post("/publickey/*/publickey/", (c) => c.json([]));
   app.post("/epic/oauth/v2/tokenInfo", (c) =>
     c.json({
       active: true,
@@ -119,4 +125,7 @@ export default (app: Hono) => {
       application_id: "fghi4567FNFBKFz3E4TROb0bmPS8h1GW",
     })
   );
+
+  app.get("/epic/friends/v1/:accountId/blocklist", (c) => c.json([]));
+  app.post("/epic/oauth/v2/revoke", (c) => c.body(null, 204));
 };

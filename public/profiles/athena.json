@@ -110440,7 +110440,8 @@
       "active_loadout_index": 0,
       "favorite_musicpack": "",
       "banner_icon": "",
-      "favorite_itemwraps": ["", "", "", "", "", "", ""]
+      "favorite_itemwraps": ["", "", "", "", "", "", ""],
+      "loadout_presets": {}
     }
   },
   "commandRevision": 0

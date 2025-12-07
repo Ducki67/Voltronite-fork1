@@ -1,7 +1,8 @@
 import { Hono } from "hono";
 import { sendError } from "../utils/senderror";
 import { Logger } from "../utils/logger";
-import { handleAthena, saveAthena } from "../utils/mcp";
+import { handleAthena, saveAthena, saveLoadout } from "../utils/mcp";
+import { v4 as uuid } from "uuid";
 
 export default (app: Hono) => {
   app.post(
@@ -10,7 +11,6 @@ export default (app: Hono) => {
       const accountId = c.req.param("accountId");
       const operation = c.req.param("operation");
       const profileId = c.req.query("profileId");
-      const rvn = c.req.query("rvn");
 
       if (!profileId)
         return sendError(
@@ -27,12 +27,11 @@ export default (app: Hono) => {
       const changes: any[] = [];
 
       try {
-        const attributes: any = await handleAthena(accountId);
-
         const profileModule = await import(
           `../../public/profiles/${profileId}.json`
         );
-        profile = profileModule.default;
+        const defaultProfile = profileModule.default;
+        profile = await handleAthena(accountId, defaultProfile);
 
         switch (operation) {
           case "QueryProfile":
@@ -40,25 +39,7 @@ export default (app: Hono) => {
           case "ClientQuestLogin":
           case "SetHardcoreModifier":
           case "RedeemRealMoneyPurchases":
-            profile.stats.attributes = {
-              ...profile.stats.attributes,
-              ...attributes,
-            };
-
-            if (attributes["Voltro-loadout"]) {
-              profile.items["Voltro-loadout"] = JSON.parse(
-                JSON.stringify(attributes["Voltro-loadout"])
-              );
-            }
-
-            if (profile.items && profile.items["Voltro-loadout"]) {
-              const locker = profile.items["Voltro-loadout"];
-              locker.attributes.banner_icon_template =
-                attributes.banner_icon || "";
-              locker.attributes.banner_color_template =
-                attributes.banner_color || "";
-            }
-
+          case "SetLoadoutShuffleEnabled":
             changes.push({ changeType: "fullProfileUpdate", profile });
             break;
 
@@ -105,49 +86,32 @@ export default (app: Hono) => {
                 : body.category === "ItemWrap"
                   ? 7
                   : 1;
-
             let lockerSlot = slots[body.category];
-
-            if (!lockerSlot) {
+            if (!lockerSlot)
               lockerSlot = slots[body.category] = {
                 items: new Array(expectedCapacity),
                 activeVariants: new Array(expectedCapacity),
               };
-            }
 
             const itemsArray = lockerSlot.items;
             const startIndex = body.slotIndex! < 0 ? 0 : body.slotIndex;
             const endIndex =
               body.slotIndex! < 0 ? expectedCapacity : startIndex! + 1;
 
-            for (let index = startIndex; index! < endIndex; index!++) {
-              for (let i = itemsArray.length; i < index!; i++) {
-                itemsArray.push("");
-              }
-
-              if (index === itemsArray.length) {
-                itemsArray.push(body.itemToSlot || "");
-              } else if (index! < itemsArray.length) {
-                itemsArray[index!] = body.itemToSlot || "";
-              }
+            while (itemsArray.length < endIndex) itemsArray.push("");
+            for (let i: any = startIndex; i < endIndex; i++) {
+              itemsArray[i] = body.itemToSlot || "";
             }
 
-            if (body.variantUpdates && body.variantUpdates.length > 0) {
+            if (body.variantUpdates?.length) {
               lockerSlot.activeVariants = [{ variants: [] }];
-              body.variantUpdates.forEach((variant) => {
+              for (const variant of body.variantUpdates) {
                 lockerSlot.activeVariants[0].variants.push({
                   channel: variant.channel,
                   active: variant.active,
                 });
-              });
+              }
             }
-
-            changes.push({
-              changeType: "itemAttrChanged",
-              itemId: body.lockerItem,
-              attributeName: "locker_slots_data",
-              attributeValue: lockerItemObj.attributes.locker_slots_data,
-            });
 
             const statName =
               body.category === "Character"
@@ -172,45 +136,31 @@ export default (app: Hono) => {
 
             if (statName) {
               let itemToSlotValue: any;
-
               if (body.category === "Dance" || body.category === "ItemWrap") {
                 const arr = profile.stats.attributes[statName] || [];
-
-                if (body.slotIndex === -1) {
+                if (body.slotIndex === -1)
                   itemToSlotValue = new Array(expectedCapacity).fill(
                     body.itemToSlot || ""
                   );
-                } else {
+                else {
                   const newArr = [...arr];
                   newArr[body.slotIndex || 0] = body.itemToSlot || "";
                   itemToSlotValue = newArr;
                 }
-              } else {
-                itemToSlotValue = body.itemToSlot || "";
-              }
-
-              changes.push({
-                changeType: "statModified",
-                name: statName,
-                value: itemToSlotValue,
-              });
+              } else itemToSlotValue = body.itemToSlot || "";
 
               profile.stats.attributes[statName] = itemToSlotValue;
-              attributes[statName] = itemToSlotValue;
             }
 
-            attributes["Voltro-loadout"] = JSON.parse(
-              JSON.stringify(lockerItemObj)
-            );
-            await saveAthena(
-              accountId,
-              attributes,
-              attributes["Voltro-loadout"]
-            );
+            profile.items["Voltro-loadout"] = lockerItemObj;
+
+            await saveAthena(accountId, profile);
 
             profile.rvn = (profile.rvn || 0) + 1;
             profile.commandRevision = (profile.commandRevision || 0) + 1;
             profile.updated = new Date().toISOString();
+
+            changes.push({ changeType: "fullProfileUpdate", profile });
             break;
           }
 
@@ -220,7 +170,6 @@ export default (app: Hono) => {
               bannerIconTemplateName: string;
               bannerColorTemplateName: string;
             }>();
-
             const item = profile.items?.[body.lockerItem];
             if (
               !item ||
@@ -240,48 +189,76 @@ export default (app: Hono) => {
             item.attributes.banner_icon_template = body.bannerIconTemplateName;
             item.attributes.banner_color_template =
               body.bannerColorTemplateName;
-
-            changes.push({
-              changeType: "itemAttrChanged",
-              itemId: body.lockerItem,
-              attributeName: "banner_icon_template",
-              attributeValue: body.bannerIconTemplateName,
-            });
-
-            changes.push({
-              changeType: "itemAttrChanged",
-              itemId: body.lockerItem,
-              attributeName: "banner_color_template",
-              attributeValue: body.bannerColorTemplateName,
-            });
-
-            changes.push({
-              changeType: "statModified",
-              name: "banner_icon",
-              value: body.bannerIconTemplateName,
-            });
-
-            changes.push({
-              changeType: "statModified",
-              name: "banner_color",
-              value: body.bannerColorTemplateName,
-            });
-
             profile.stats.attributes.banner_icon = body.bannerIconTemplateName;
             profile.stats.attributes.banner_color =
               body.bannerColorTemplateName;
-            attributes.banner_icon = body.bannerIconTemplateName;
-            attributes.banner_color = body.bannerColorTemplateName;
-            attributes["Voltro-loadout"] = JSON.parse(JSON.stringify(item));
-            await saveAthena(
-              accountId,
-              attributes,
-              attributes["Voltro-loadout"]
-            );
+
+            profile.items["Voltro-loadout"] = item;
+            await saveAthena(accountId, profile);
 
             profile.rvn = (profile.rvn || 0) + 1;
             profile.commandRevision = (profile.commandRevision || 0) + 1;
             profile.updated = new Date().toISOString();
+            changes.push({ changeType: "fullProfileUpdate", profile });
+            break;
+          }
+
+          case "PutModularCosmeticLoadout": {
+            const body = await c.req.json<{
+              loadoutType: string;
+              presetId: number;
+              loadoutData: any;
+            }>();
+            if (!body.loadoutType || body.presetId == null || !body.loadoutData)
+              return sendError(
+                c,
+                "errors.voltronite.mcp.invalid_request",
+                "Missing fields",
+                [],
+                2023,
+                undefined,
+                400
+              );
+
+            let loadoutData = body.loadoutData;
+            if (typeof loadoutData === "string")
+              loadoutData = JSON.parse(loadoutData);
+
+            profile.stats.attributes.loadout_presets ||= {};
+            profile.stats.attributes.loadout_presets[body.loadoutType] ||= {};
+            const presets =
+              profile.stats.attributes.loadout_presets[body.loadoutType];
+
+            let loadoutId = presets[body.presetId];
+            if (!loadoutId)
+              ((loadoutId = uuid().replace(/-/g, "")),
+                (presets[body.presetId] = loadoutId));
+
+            profile.items[loadoutId] = {
+              templateId: body.loadoutType,
+              attributes: loadoutData,
+              quantity: 1,
+            };
+            for (const slot of loadoutData.slots || []) {
+              if (!slot.equipped_item) continue;
+              const exists = Object.values(profile.items).some(
+                (item: any) =>
+                  item.templateId.toLowerCase() ===
+                  slot.equipped_item.toLowerCase()
+              );
+              if (!exists)
+                profile.items[uuid().replace(/-/g, "")] = {
+                  templateId: slot.equipped_item,
+                  attributes: { variants: [] },
+                  quantity: 1,
+                };
+            }
+
+            profile.rvn = (profile.rvn || 0) + 1;
+            profile.commandRevision = (profile.commandRevision || 0) + 1;
+
+            await saveLoadout(accountId, profile);
+            changes.push({ changeType: "fullProfileUpdate", profile });
             break;
           }
 
@@ -297,19 +274,10 @@ export default (app: Hono) => {
             );
         }
 
-        const baseRevision = rvn
-          ? parseInt(rvn)
-          : profile.rvn - (changes.length > 0 ? 1 : 0);
-
-        if (parseInt(rvn!) !== profile.rvn) {
-          changes.length = 0;
-          changes.push({ changeType: "fullProfileUpdate", profile });
-        }
-
         return c.json({
           profileRevision: profile.rvn,
           profileId,
-          profileChangesBaseRevision: baseRevision,
+          profileChangesBaseRevision: parseInt(c.req.query("rvn") ?? "0"),
           profileChanges: changes,
           profileCommandRevision: profile.commandRevision,
           serverTime: new Date().toISOString(),
