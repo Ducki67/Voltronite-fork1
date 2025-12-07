@@ -9,7 +9,7 @@ global.accessTokens ??= [];
 
 loadRoutes(app);
 
-app.use(logger());
+//app.use(logger());
 app.get("/", (c) => c.text("Voltronite, Made by Razer!"));
 app.get("/unknown", (c) => c.json({}));
 app.notFound((c) => {
