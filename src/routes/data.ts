@@ -46,7 +46,7 @@ export default (app: Hono) => {
           MANIFEST: {
             signature: "Voltronite",
             distribution: "https://epicgames-download1.akamaized.net/",
-            path: "Builds/Fortnite/Content/CloudDir/MsLPrbifCpWz-2JnL0KySgGuvnwL9Q.manifest", // replace *.manifest with a valid manifest (e.g: RxwT9fhXyJWzLl0WXky5X98eJx9XfQ.manifest)
+            path: "Builds/Fortnite/Content/CloudDir/5iPxSPBymtYv7Wmnd0u34QMyBCTo1w.manifest", // replace *.manifest with a valid manifest (e.g: RxwT9fhXyJWzLl0WXky5X98eJx9XfQ.manifest)
             additionalDistributions: [],
           },
         },

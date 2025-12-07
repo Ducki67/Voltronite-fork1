@@ -40,6 +40,8 @@ export default (app: Hono) => {
           case "SetHardcoreModifier":
           case "RedeemRealMoneyPurchases":
           case "SetLoadoutShuffleEnabled":
+          case "SetCosmeticLockerSlots":
+          case "SetRandomCosmeticLoadoutFlag":
             changes.push({ changeType: "fullProfileUpdate", profile });
             break;
 

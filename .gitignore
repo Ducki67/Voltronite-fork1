@@ -34,3 +34,6 @@ public/usersettings
 
 # MCP Shit
 public/profiles/user_athena
+
+# .env
+.env
