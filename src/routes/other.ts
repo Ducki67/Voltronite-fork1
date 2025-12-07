@@ -61,7 +61,7 @@ export default (app: Hono) => {
     })
   );
 
-  app.post("/datarouter/api/v1/public/data", (c) => c.body(null, 204));
+  app.post("/datarouter/api/v1/public/*", (c) => c.body(null, 204));
 
   app.get("/fortnite/api/game/v2/enabled_features", (c) => c.json([]));
 

@@ -7,6 +7,19 @@ import { GetVersionInfo } from "../utils/funcs";
 
 export default (app: Hono) => {
   // ts is js for mobile ig
+  app.get("/launcher/api/public/distributionpoints", (c) =>
+    c.json({
+      distributions: [
+        "https://epicgames-download1.akamaized.net/",
+        "https://download.epicgames.com/",
+        "https://download2.epicgames.com/",
+        "https://download3.epicgames.com/",
+        "https://download4.epicgames.com/",
+        "https://fastly-download.epicgames.com/",
+      ],
+    })
+  );
+
   app.get("/launcher/api/public/distributionpoints/", (c) =>
     c.json({
       distributions: [
@@ -200,21 +213,26 @@ export default (app: Hono) => {
         case 10:
           bg.stage = "seasonx";
           break;
+
         case 11:
           bg.stage =
             version.build === 11.31 || version.build === 11.4
               ? "Winter19"
               : "season11";
           break;
+
         case 12:
           bg.stage = "season12";
           break;
+
         case 13:
           bg.stage = "season13";
           break;
+
         case 14:
           bg.stage = "season14";
           break;
+
         case 15:
           bg.stage = "season15";
           if (version.build === 15.1) {
@@ -223,15 +241,19 @@ export default (app: Hono) => {
               "XmasStore2020";
           }
           break;
+
         case 16:
           bg.stage = "season16";
           break;
+
         case 17:
           bg.stage = "season17";
           break;
+
         case 18:
           bg.stage = "season18";
           break;
+
         case 19:
           bg.stage = version.build === 19.01 ? "winter2021" : "season19";
           bg.backgroundimage =
@@ -239,11 +261,156 @@ export default (app: Hono) => {
               ? "https://cdn2.unrealengine.com/t-bp19-lobby-xmas-2048x1024-f85d2684b4af.png"
               : "";
           break;
+
+        case 20:
+          bg.stage = "season20";
+          bg.backgroundimage =
+            version.build === 20.4
+              ? "https://cdn2.unrealengine.com/t-bp20-40-armadillo-glowup-lobby-2048x2048-2048x2048-3b83b887cc7f.jpg"
+              : "https://cdn2.unrealengine.com/s20-landscapev4-2048x1024-2494a103ae6c.png";
+          break;
+
+        case 21:
+          bg.stage = version.build === 21.3 ? "season2130" : "season2100";
+          bg.backgroundimage =
+            version.build === 21.3
+              ? "https://cdn2.unrealengine.com/nss-lobbybackground-2048x1024-f74a14565061.jpg"
+              : "https://cdn2.unrealengine.com/s21-lobby-background-2048x1024-2e7112b25dc3.jpg";
+          break;
+
+        case 22:
+          bg.backgroundimage =
+            "https://cdn2.unrealengine.com/t-bp22-lobby-square-2048x2048-2048x2048-e4e90c6e8018.jpg";
+          break;
+
+        case 23:
+          if (version.build === 23.1) {
+            bg.backgroundimage =
+              "https://cdn2.unrealengine.com/t-bp23-winterfest-lobby-square-2048x2048-2048x2048-277a476e5ca6.png";
+          } else {
+            bg.stage = "defaultnotris";
+            bg.backgroundimage =
+              "https://cdn2.unrealengine.com/t-bp23-lobby-2048x1024-2048x1024-26f2c1b27f63.png";
+          }
+          break;
+
+        case 24:
+          bg.stage = "defaultnotris";
+          bg.backgroundimage =
+            "https://static.wikia.nocookie.net/fortnite/images/e/e7/Chapter_4_Season_2_-_Lobby_Background_-_Fortnite.png";
+          break;
+
+        case 25:
+          bg.stage = "defaultnotris";
+          bg.backgroundimage =
+            "https://static.wikia.nocookie.net/fortnite/images/c/ca/Chapter_4_Season_3_-_Lobby_Background_-_Fortnite.png";
+          break;
+
+        case 26:
+          if (version.build === 26.3) {
+            bg.stage = "season2630";
+            bg.backgroundimage =
+              "https://cdn2.unrealengine.com/s26-lobby-timemachine-final-2560x1440-a3ce0018e3fa.jpg";
+          } else {
+            bg.stage = "season2600";
+            bg.backgroundimage =
+              "https://cdn2.unrealengine.com/0814-ch4s4-lobby-2048x1024-2048x1024-e3c2cf8d342d.png";
+          }
+          break;
+
+        case 27:
+          if (version.build === 27.11) {
+            bg.stage = "defaultnotris";
+            bg.backgroundimage =
+              "https://cdn2.unrealengine.com/durianlobby2-4096x2048-242a51b6a8ee.jpg";
+          } else {
+            bg.stage = "season2700";
+          }
+          break;
+
+        case 28:
+          if (version.build === 28.2) {
+            bg.stage = "defaultnotris";
+            bg.backgroundimage =
+              "https://cdn2.unrealengine.com/s28-tmnt-lobby-4096x2048-e6c06a310c05.jpg";
+          } else {
+            bg.stage = "defaultnotris";
+            bg.backgroundimage =
+              "https://cdn2.unrealengine.com/ch5s1-lobbybg-3640x2048-0974e0c3333c.jpg";
+          }
+          break;
+
         default:
           bg.stage = "defaultnotris";
           break;
       }
     }
+
+    contentpages.shopSections = {
+      _title: "shop-sections",
+      sectionList: {
+        _type: "ShopSectionList",
+        sections: [
+          {
+            bSortOffersByOwnership: false,
+            bShowIneligibleOffersIfGiftable: false,
+            bEnableToastNotification: true,
+            background: {
+              stage: "default",
+              _type: "DynamicBackground",
+              key: "vault",
+            },
+            _type: "ShopSection",
+            landingPriority: 0,
+            bHidden: false,
+            sectionId: "Section1",
+            bShowTimer: true,
+            sectionDisplayName: "Wonder Woman",
+            bShowIneligibleOffers: true,
+          },
+          {
+            bSortOffersByOwnership: false,
+            bShowIneligibleOffersIfGiftable: false,
+            bEnableToastNotification: true,
+            background: {
+              stage: "default",
+              _type: "DynamicBackground",
+              key: "vault",
+            },
+            _type: "ShopSection",
+            landingPriority: 1,
+            bHidden: false,
+            sectionId: "Section3",
+            bShowTimer: true,
+            sectionDisplayName: "Featured",
+            bShowIneligibleOffers: true,
+          },
+          {
+            bSortOffersByOwnership: false,
+            bShowIneligibleOffersIfGiftable: false,
+            bEnableToastNotification: true,
+            background: {
+              stage: "default",
+              _type: "DynamicBackground",
+              key: "vault",
+            },
+            _type: "ShopSection",
+            landingPriority: 2,
+            bHidden: false,
+            sectionId: "Section2",
+            bShowTimer: true,
+            sectionDisplayName: "Daily",
+            bShowIneligibleOffers: true,
+          },
+        ],
+      },
+      _noIndex: false,
+      _activeDate: "2022-12-01T23:45:00.000Z",
+      lastModified: "2022-12-01T21:50:44.089Z",
+      _locale: "en-US",
+      _templateName: "FortniteGameShopSections",
+      _suggestedPrefetch: [],
+    };
 
     return c.json(contentpages);
   });

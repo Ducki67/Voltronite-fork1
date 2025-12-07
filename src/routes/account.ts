@@ -1,7 +1,6 @@
 import { Hono } from "hono";
 import { sendError } from "../utils/senderror";
 import { v4 as uuid } from "uuid";
-import sdk from "../../public/responses/sdk.json";
 import fs from "fs";
 import path from "path";
 import { Logger } from "../utils/logger";
@@ -41,13 +40,13 @@ export default (app: Hono) => {
       case "password":
         if (!body.username) return c.status(400);
         username = body.username.split("@")[0];
-        accountId = uuid().replace(/-/g, "");
+        accountId = Buffer.from(username).toString("hex");
         break;
 
       case "authorization_code":
         if (!body.code) return c.status(400);
         username = body.code;
-        accountId = uuid().replace(/-/g, "");
+        accountId = Buffer.from(username).toString("hex");
         break;
 
       case "exchange_code":
@@ -63,6 +62,11 @@ export default (app: Hono) => {
         accountId = record.accountId;
         break;
 
+      case "device_auth":
+        const { account_id, device_id } = body;
+        username = Buffer.from(device_id, "hex").toString();
+        accountId = account_id;
+        break;
       default:
         return sendError(
           c,
@@ -137,7 +141,7 @@ export default (app: Hono) => {
     if (typeof accountId === "string") {
       response.push({
         id: accountId,
-        displayName: `user-${accountId}`,
+        displayName: Buffer.from(accountId, "hex").toString(),
         externalAuths: {},
       });
     }
@@ -147,7 +151,7 @@ export default (app: Hono) => {
       for (const id of accountIds) {
         response.push({
           id,
-          displayName: `user-${id}`,
+          displayName: Buffer.from(id, "hex").toString(),
           externalAuths: {},
         });
       }
@@ -194,56 +198,6 @@ export default (app: Hono) => {
     c.json([])
   );
 
-  app.post("/auth/v1/oauth/token", (c) => {
-    return c.json({
-      access_token: encodeToken({ oauth: true }),
-      token_type: "bearer",
-      expires_in: 2069,
-      expires_at: "2069-01-01T00:00:00.000Z",
-      nonce: "Voltronite",
-      features: ["AntiCheat", "Connect", "Ecom"],
-      deployment_id: "wowdeployid",
-      organization_id: "woworgid",
-      organization_user_id: "woworguserid",
-      product_id: "prod-fn",
-      product_user_id: "wowproductuserid",
-      product_user_id_created: false,
-      id_token: "wowidtoken",
-      sandbox_id: "fn",
-    });
-  });
-
-  app.get("/epic/id/v2/sdk/accounts", (c) => {
-    return c.json([
-      {
-        accountId: uuid().replace(/-/g, ""),
-        displayName: uuid().replace(/-/g, ""),
-        preferredLanguage: "en",
-        cabinedMode: false,
-        empty: false,
-      },
-    ]);
-  });
-
-  app.post("/epic/oauth/v2/token", (c) => {
-    const accountId = uuid().replace(/-/g, "");
-    return c.json({
-      scope: "basic_profile friends_list openid presence",
-      token_type: "bearer",
-      access_token: encodeToken({ accountId }),
-      expires_in: 2069,
-      expires_at: "2069-01-01T00:00:00.000Z",
-      refresh_token: "wowrefreshtoken",
-      refresh_expires_in: 2067,
-      refresh_expires_at: "2067-01-01T00:00:00.000Z",
-      accountId,
-      client_id: "wowclientid",
-      application_id: "wowappid",
-      selected_account_id: accountId,
-      id_token: "wowidtoken",
-    });
-  });
-
   app.get("/account/api/epicdomains/ssodomains", (c) =>
     c.json([
       "unrealengine.com",
@@ -288,8 +242,6 @@ export default (app: Hono) => {
     return c.json({ code, accountId, expiresInSeconds });
   });
 
-  app.get("/sdk/v1/*", (c) => c.json(sdk));
-
   app.get("/login", async (c) => {
     const filePath = path.join(__dirname, "../../public/auth/MobileLogin.html");
     try {
@@ -307,12 +259,16 @@ export default (app: Hono) => {
   app.post("/account/api/public/account/:accountId/deviceAuth", (c) =>
     c.json({
       accountId: c.req.param("accountId"),
-      deviceId: "null",
-      secret: "null",
+      deviceId: c.req.param("accountId"),
+      secret: "udsecretwow",
     })
   );
 
   app.delete("/account/api/public/account/:accountId/deviceAuth/*", (c) =>
     c.body(null, 204)
+  );
+
+  app.all("/account/api/public/account/:accountId/linkIdentity", (c) =>
+    c.json({})
   );
 };
