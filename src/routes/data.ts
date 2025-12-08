@@ -35,8 +35,28 @@ export default (app: Hono) => {
 
   app.get(
     "/launcher/api/public/assets/:platform/:catalogItemId/:appName",
-    (c) =>
-      c.json({
+    (c) => {
+      const platform = c.req.param("platform");
+      if (platform !== "Android") {
+        return c.json({
+          appName: c.req.param("appName"),
+          labelName: c.req.query("label"),
+          buildVersion: "Voltronite",
+          catalogItemId: c.req.param("catalogItemId"),
+          expires: "9999-12-31T23:59:59.999Z",
+          items: {
+            MANIFEST: {
+              signature: "Voltronite",
+              distribution: "https://voltronite.ol.epicgames.com/",
+              path: "Builds/Fortnite/Content/CloudDir/manifest.manifest",
+              additionalDistributions: [],
+            },
+          },
+          assetId: c.req.param("appName"),
+        });
+      }
+
+      return c.json({
         appName: c.req.param("appName"),
         labelName: c.req.query("label"),
         buildVersion: "Voltronite",
@@ -46,13 +66,47 @@ export default (app: Hono) => {
           MANIFEST: {
             signature: "Voltronite",
             distribution: "https://epicgames-download1.akamaized.net/",
-            path: "Builds/Fortnite/Content/CloudDir/5iPxSPBymtYv7Wmnd0u34QMyBCTo1w.manifest", // replace *.manifest with a valid manifest (e.g: RxwT9fhXyJWzLl0WXky5X98eJx9XfQ.manifest)
+            path: "Builds/Fortnite/Content/CloudDir/s3Z2Diebae5FbF5cHUqo1-SsTk_FzQ.manifest", // replace *.manifest with a valid manifest (e.g: RxwT9fhXyJWzLl0WXky5X98eJx9XfQ.manifest)
             additionalDistributions: [],
           },
         },
         assetId: c.req.param("appName"),
-      })
+      });
+    }
   );
+
+  app.get("/Builds/Fortnite/Content/CloudDir/:file.manifest", async (c) => {
+    const filePath = "./public/clouddir/manifest.manifest";
+    const data = await fs.promises.readFile(filePath);
+
+    return new Response(data, {
+      headers: {
+        "Content-Type": "application/octet-stream",
+      },
+    });
+  });
+
+  app.get("/Builds/Fortnite/Content/CloudDir/manifest/:file.ini", async (c) => {
+    const filePath = "./public/clouddir/Full.ini";
+    const data = await fs.promises.readFile(filePath);
+
+    return new Response(data, {
+      headers: {
+        "Content-Type": "application/octet-stream",
+      },
+    });
+  });
+
+  app.get("/Builds/Fortnite/Content/CloudDir/:file.chunk", async (c) => {
+    const filePath = "./public/clouddir/manifest.chunk";
+    const data = await fs.promises.readFile(filePath);
+
+    return new Response(data, {
+      headers: {
+        "Content-Type": "application/octet-stream",
+      },
+    });
+  });
 
   // ContentPages/MOTD stuff
   app.get("/content/api/pages/fortnite-game/spark-tracks", async (c) => {
