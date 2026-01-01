@@ -48,6 +48,7 @@ varying levels of stability and feature completeness:
 - **Chapter 4** --- Fully working, except some matchmaking limitations on some version. (Tested on 23.50 and 27.11)
 - **Chapter 5** --- Fully working (tested on 28.30)
 
+**Recomended to use [*Erbium*](https://github.com/plooshi/Erbium) as GameServer for chapters 3+ and for to matchmake to.**
 ---
 
 ## 📜 License
