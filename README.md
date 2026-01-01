@@ -34,7 +34,19 @@ services, allowing connections on older versions of the game.
     ```
 
 ---
+## How to set up matchmaking
+1. **Load up a OG build**\
+    Get any builds from [*here*](https://github.com/llamaqwerty/fortnite-builds-archive)
+2. **Use Erbium GameServer**\
+    Make sure to use Erbium ot Other GS that supports your version(s)
+3. **Ip & port** (for each user)\
+    In lobby make sure to click on *Custom key* and type: **`127.0.0.1:7777`**. So **`IP:GsPort`**\
+    <img width="350" height="375" alt="image" src="https://github.com/user-attachments/assets/42e477df-4470-4e2e-9215-410020cf0578" /> \
+    After that click on *Accept* and start queing / MatchMaking to any gamemode. (it will depend on the GS and its playlist)
 
+Yay! you made it now you should get into your match :)
+
+---
 ## 🛠️ Support & Compatibility
 
 Voltronite currently provides multi-chapter Fortnite support with
