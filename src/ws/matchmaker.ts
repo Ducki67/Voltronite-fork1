@@ -7,7 +7,7 @@ const wss = new WebSocketServer({ port });
 
 wss.on("listening", () => {
   Logger.matchmaker(
-    `Voltronite Matchmaker successfully started on port ${port}`
+    `Voltronite Matchmaker successfully started on port \x1b[33m${port}\x1b[0m`
   );
 });
 

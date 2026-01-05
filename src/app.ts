@@ -9,7 +9,32 @@ global.accessTokens ??= [];
 
 loadRoutes(app);
 
-//app.use(logger());
+
+
+const port = Number(process.env.PORT);
+
+Bun.serve({
+  fetch: app.fetch,
+  port,
+  hostname: "0.0.0.0",
+});
+
+Logger.backend(`Voltronite successfully started on port \x1b[33m${port}\x1b[0m`);
+Logger.backend(`Dev Server running on \x1b[34mhttp://localhost:${port}\x1b[0m`);
+
+
+// load external stuff
+import "./ws/matchmaker";
+import { logger } from "hono/logger";
+
+if (process.env.USE_SETTINGS_PANNEL === 'true') {
+  import("./utils/Services/settings");
+}
+// log everything here!! Using  USE_LOGGER env var
+if (process.env.USE_LOGGER === "true") {
+  app.use("*", logger());
+
+  
 app.get("/", (c) => c.text("Voltronite, Made by Razer!"));
 app.get("/unknown", (c) => c.json({}));
 app.notFound((c) => {
@@ -25,16 +50,5 @@ app.notFound((c) => {
   );
 });
 
-const port = Number(process.env.PORT);
 
-Bun.serve({
-  fetch: app.fetch,
-  port,
-  hostname: "0.0.0.0",
-});
-
-Logger.backend(`Voltronite successfully started on port ${port}`);
-
-// load external stuff
-import "./ws/matchmaker";
-import { logger } from "hono/logger";
+}
