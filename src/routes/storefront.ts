@@ -3,6 +3,7 @@ import fs from "fs";
 import v1 from "../../public/responses/catalog/v1.json";
 import v2 from "../../public/responses/catalog/v2.json";
 import { GetVersionInfo } from "../utils/funcs";
+import { Status } from "discord.js";
 
 export default (app: Hono) => {
   app.get("/fortnite/api/storefront/v2/keychain", (c) => {

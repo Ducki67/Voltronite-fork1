@@ -142,6 +142,20 @@ export default (app: Hono) => {
               title: "Voltronite",
               spotlight: false,
             },
+            {
+              hidden: false,
+              _type: "CommonUI Simple Message Base",
+              body: "Made by Razer. \nDiscord: https://discord.gg/e3ggRHrtrc",
+              title: "Voltronite",
+              spotlight: false,
+            },
+            {
+              hidden: false,
+              _type: "CommonUI Simple Message Base",
+              body: "Made by Razer. \nDiscord: https://discord.gg/e3ggRHrtrc",
+              title: "Voltronite",
+              spotlight: false,
+            }
           ],
         },
         "jcr:isCheckedOut": true,
