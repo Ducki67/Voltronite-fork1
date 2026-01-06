@@ -44,6 +44,9 @@ services, allowing connections on older versions of the game.
     <img width="350" height="375" alt="image" src="https://github.com/user-attachments/assets/42e477df-4470-4e2e-9215-410020cf0578" /> \
     After that click on *Accept* and start queing / MatchMaking to any gamemode. (it will depend on the GS and its playlist)
 
+## Or
+ 1. change smthing in the `.env` config file SOON ILL EXPLAIN!!
+
 Yay! you made it now you should get into your match :)
 
 ---
