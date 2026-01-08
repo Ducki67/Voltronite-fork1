@@ -3,6 +3,22 @@
 Voltronite is an **OGFN backend** used to simulate or emulate Fortnite
 services, allowing connections on older versions of the game.
 
+## Personal changes made by Me
+<details>
+<headder> Admin/Settings pannel (under the works) </headder> <br>
+ - Config changing <br>
+ - Login system <br>
+ - Backend controllers: Restart, Shutdown
+</br>
+
+<headder2> MatchMaking / Matchmaker
+</headder2> <br>
+ - not done fully
+
+</details>
+    
+
+
 ---
 
 ## 🚀 Features
