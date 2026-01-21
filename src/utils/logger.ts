@@ -1,4 +1,4 @@
-type LogType = "backend" | "matchmaker" | "error";
+type LogType = "backend" | "matchmaker" | "season" | "error";
 
 function format(type: LogType, message: string): string {
   const now = new Date();
@@ -10,6 +10,9 @@ function format(type: LogType, message: string): string {
 export const Logger = {
   backend(message: string): void {
     console.log(format("backend", message));
+  },
+  season(message: string): void {
+    console.log(format("season", message));
   },
   matchmaker(message: string): void {
     console.log(format("matchmaker", message));

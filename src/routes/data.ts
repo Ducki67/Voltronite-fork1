@@ -4,6 +4,7 @@ import path from "path";
 import axios from "axios";
 import crypto from "crypto";
 import { GetVersionInfo } from "../utils/funcs";
+import { Logger } from "../utils/logger";
 
 export default (app: Hono) => {
   // ts is js for mobile ig
@@ -141,20 +142,6 @@ export default (app: Hono) => {
               body: "Made by Razer. \nDiscord: https://discord.gg/e3ggRHrtrc",
               title: "Voltronite",
               spotlight: false,
-            },
-            {
-              hidden: false,
-              _type: "CommonUI Simple Message Base",
-              body: "Made by Razer. \nDiscord: https://discord.gg/e3ggRHrtrc",
-              title: "Voltronite",
-              spotlight: false,
-            },
-            {
-              hidden: false,
-              _type: "CommonUI Simple Message Base",
-              body: "Made by Razer. \nDiscord: https://discord.gg/e3ggRHrtrc",
-              title: "Voltronite",
-              spotlight: false,
             }
           ],
         },
@@ -220,6 +207,24 @@ export default (app: Hono) => {
               body: "Made by Razer.\nDiscord: https://discord.gg/e3ggRHrtrc",
               spotlight: false,
             },
+             {
+              image: "https://i.imgur.com/lJVudDn.png",
+              hidden: false,
+              messagetype: "normal",
+              _type: "CommonUI Simple Message Base",
+              title: "Voltronite",
+              body: "Made by Razer.\nDiscord: https://discord.gg/e3ggRHrtrc",
+              spotlight: false,
+            },
+             {
+              image: "https://i.imgur.com/lJVudDn.png",
+              hidden: false,
+              messagetype: "normal",
+              _type: "CommonUI Simple Message Base",
+              title: "Voltronite",
+              body: "Made by Razer.\nDiscord: https://discord.gg/e3ggRHrtrc",
+              spotlight: false,
+            }
           ],
         },
         _title: "battleroyalenews",
@@ -298,8 +303,23 @@ export default (app: Hono) => {
       bg.backgroundimage = "";
 
       switch (version.season) {
+        case 7:
+          bg.stage = "season7";
+          break;
+        case 8:
+          bg.stage = "season8";
+          break;
+         case 9:
+          bg.stage = "season9";
+          break;
+
+
         case 10:
           bg.stage = "seasonx";
+          bg.stage =
+          version.build === 10.31 || version.build === 10.4
+              ? "blackmonday"
+              : "blackmonday";
           break;
         case 11:
           bg.stage =
@@ -414,6 +434,14 @@ export default (app: Hono) => {
           break;
       }
     }
+    if (process.env.USE_LOGGER === "true") {
+      Logger.season("Modified FortniteGame content page.");
+      // log the season and build and background stage
+      Logger.season(
+        `Season: ${version.season}, Build: ${version.build}, Background Stage: ${contentpages.dynamicbackgrounds?.backgrounds?.backgrounds?.[0]?.stage} \n`
+      );
+    };
+
 
     contentpages.shopSections = {
       _title: "shop-sections",
