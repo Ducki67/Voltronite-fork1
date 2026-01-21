@@ -3,6 +3,22 @@
 Voltronite is an **OGFN backend** used to simulate or emulate Fortnite
 services, allowing connections on older versions of the game.
 
+## Personal changes made by Me
+<details>
+<headder> Admin/Settings pannel (under the works) </headder> <br>
+ - Config changing <br>
+ - Login system <br>
+ - Backend controllers: Restart, Shutdown
+</br>
+
+<headder2> MatchMaking / Matchmaker
+</headder2> <br>
+ - not done fully
+
+</details>
+    
+
+
 ---
 
 ## 🚀 Features
@@ -42,10 +58,11 @@ services, allowing connections on older versions of the game.
 3. **Ip & port** (for each user)\
     In lobby make sure to click on *Custom key* and type: **`127.0.0.1:7777`**. So **`IP:GsPort`**\
     <img width="350" height="375" alt="image" src="https://github.com/user-attachments/assets/42e477df-4470-4e2e-9215-410020cf0578" /> \
-    After that click on *Accept* and start queing / MatchMaking to any gamemode. (it will depend on the GS and its playlist)
-
-      **OR**
- 1. change smthing in the `.env` config file SOON ILL EXPLAIN!!
+    After that click on *Accept* and start queing / MatchMaking to any gamemode. (it will depend on the GS and its playlist)\
+   **OR**\
+ 5. *(optional)*  Change **`USE_CUSTOM_MATCHMAKING_CODE`** to **false** in the `.env` config file and atfer that the backend Will use the **`GAMESERVER_IP`** setting (currently set to: *127.0.0.1:7777*) when u matchmake so with this happens automaticly so you don't have to do **Step 3.** in this setup.
+>[!NOTE]
+> This will NOT work past ch3s1 *i think* ALSO this can be bugged on seasons 15-16 i higly recomend doing this setup untill **Step 3** or just use it for builds that are S14 and below!!!
 
 Yay! you made it now you should get into your match :)
 
