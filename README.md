@@ -30,7 +30,7 @@ services, allowing connections on older versions of the game.
 4.  **Run the backend**
 
     ```bash
-    bun run src/index.ts
+    bun run src/app.ts
     ```
 
 ---
