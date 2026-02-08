@@ -1,438 +1,108 @@
-import { Hono } from "hono";
-import { sendError } from "../utils/senderror";
-import { Logger } from "../utils/logger";
-import { handleAthena, saveAthena, saveLoadout } from "../utils/mcp";
-import { v4 as uuid } from "uuid";
-import { GetVersionInfo } from "../utils/funcs";
+import { promises as fs } from "fs";
+import path from "path";
 
-export default (app: Hono) => {
-  app.post(
-    "/fortnite/api/game/v2/profile/:accountId/:type/:operation",
-    async (c) => {
-      const accountId = c.req.param("accountId");
-      const operation = c.req.param("operation");
-      const profileId = c.req.query("profileId");
-      const verInfo = GetVersionInfo(c.req);
+export const ATHENA_DIR = path.join(
+  process.cwd(),
+  "public/profiles/user_athena",
+);
 
-      if (!profileId)
-        return sendError(
-          c,
-          "errors.invalid_request",
-          "profileId missing",
-          [],
-          400,
-          "missing_profileId",
-          400,
-        );
+export async function handleAthena(accountId: string, profile: any) {
+  const accountDir = path.join(ATHENA_DIR, accountId);
+  await fs.mkdir(accountDir, { recursive: true });
 
-      let profile: any;
-      const changes: any[] = [];
+  const athenaPath = path.join(accountDir, "athena.json");
+  const loadoutPath = path.join(accountDir, "ch5", "loadout.json");
 
-      try {
-        let profileModule;
-        if (profileId == "athena") {
-          profileModule =
-            verInfo.season <= 18
-              ? await import(`../../public/profiles/athena_old.json`)
-              : await import(`../../public/profiles/athena.json`);
-        } else {
-          profileModule = await import(
-            `../../public/profiles/${profileId}.json`
-          );
-        }
+  let athenaData: any = {};
+  let loadoutData: any = {};
 
-        const defaultProfile = profileModule.default;
-        profile = await handleAthena(accountId, defaultProfile);
+  try {
+    const rawAthena = await fs.readFile(athenaPath, "utf8");
+    athenaData = JSON.parse(rawAthena);
+  } catch {}
 
-        switch (operation) {
-          case "QueryProfile":
-          case "SetMtxPlatform":
-          case "ClientQuestLogin":
-          case "SetHardcoreModifier":
-          case "RedeemRealMoneyPurchases":
-          case "SetLoadoutShuffleEnabled":
-          case "SetCosmeticLockerSlots":
-          case "SetRandomCosmeticLoadoutFlag":
-          case "ClaimMfaEnabled":
-            changes.push({ changeType: "fullProfileUpdate", profile });
-            break;
+  try {
+    const rawLoadout = await fs.readFile(loadoutPath, "utf8");
+    loadoutData = JSON.parse(rawLoadout);
+  } catch {}
 
-          case "SetCosmeticLockerSlot": {
-            const body = await c.req.json<{
-              category: string;
-              lockerItem: string;
-              itemToSlot?: string;
-              slotIndex?: number;
-              variantUpdates?: { channel: string; active: string }[];
-            }>();
+  if (athenaData.stats) {
+    profile.stats = {
+      ...profile.stats,
+      ...athenaData.stats,
+    };
+  }
 
-            if (!body.category || !body.lockerItem)
-              return sendError(
-                c,
-                "errors.invalid_request",
-                "category or lockerItem missing",
-                [],
-                400,
-                "invalid_request",
-                400,
-              );
+  if (athenaData.items?.["Voltro-loadout"]) {
+    profile.items = profile.items || {};
+    profile.items["Voltro-loadout"] = athenaData.items["Voltro-loadout"];
+  }
 
-            const lockerItemObj = profile.items?.[body.lockerItem];
-            if (
-              !lockerItemObj ||
-              lockerItemObj.templateId.toLowerCase() !==
-                "cosmeticlocker:cosmeticlocker_athena"
-            )
-              return sendError(
-                c,
-                "errors.invalid_locker_item",
-                "Locker item invalid",
-                [],
-                400,
-                "invalid_locker_item",
-                400,
-              );
+  if (loadoutData.items) {
+    profile.items = profile.items || {};
+    for (const loadoutId of Object.keys(loadoutData.items)) {
+      profile.items[loadoutId] = loadoutData.items[loadoutId];
+    }
+  }
 
-            const slots = lockerItemObj.attributes.locker_slots_data.slots;
-            const expectedCapacity =
-              body.category === "Dance"
-                ? 6
-                : body.category === "ItemWrap"
-                  ? 7
-                  : 1;
-            let lockerSlot = slots[body.category];
-            if (!lockerSlot)
-              lockerSlot = slots[body.category] = {
-                items: new Array(expectedCapacity),
-                activeVariants: new Array(expectedCapacity),
-              };
-
-            const itemsArray = lockerSlot.items;
-            const startIndex = body.slotIndex! < 0 ? 0 : body.slotIndex;
-            const endIndex =
-              body.slotIndex! < 0 ? expectedCapacity : startIndex! + 1;
-
-            while (itemsArray.length < endIndex) itemsArray.push("");
-            for (let i: any = startIndex; i < endIndex; i++) {
-              itemsArray[i] = body.itemToSlot || "";
-            }
-
-            if (body.variantUpdates?.length) {
-              lockerSlot.activeVariants = [{ variants: [] }];
-              for (const variant of body.variantUpdates) {
-                lockerSlot.activeVariants[0].variants.push({
-                  channel: variant.channel,
-                  active: variant.active,
-                });
-              }
-            }
-
-            const statName =
-              body.category === "Character"
-                ? "favorite_character"
-                : body.category === "Backpack"
-                  ? "favorite_backpack"
-                  : body.category === "Pickaxe"
-                    ? "favorite_pickaxe"
-                    : body.category === "Glider"
-                      ? "favorite_glider"
-                      : body.category === "SkyDiveContrail"
-                        ? "favorite_skydivecontrail"
-                        : body.category === "MusicPack"
-                          ? "favorite_musicpack"
-                          : body.category === "LoadingScreen"
-                            ? "favorite_loadingscreen"
-                            : body.category === "Dance"
-                              ? "favorite_dance"
-                              : body.category === "ItemWrap"
-                                ? "favorite_itemwraps"
-                                : null;
-
-            if (statName) {
-              let itemToSlotValue: any;
-              if (body.category === "Dance" || body.category === "ItemWrap") {
-                const arr = profile.stats.attributes[statName] || [];
-                if (body.slotIndex === -1)
-                  itemToSlotValue = new Array(expectedCapacity).fill(
-                    body.itemToSlot || "",
-                  );
-                else {
-                  const newArr = [...arr];
-                  newArr[body.slotIndex || 0] = body.itemToSlot || "";
-                  itemToSlotValue = newArr;
-                }
-              } else itemToSlotValue = body.itemToSlot || "";
-
-              profile.stats.attributes[statName] = itemToSlotValue;
-            }
-
-            profile.items["Voltro-loadout"] = lockerItemObj;
-
-            await saveAthena(accountId, profile);
-
-            profile.rvn = (profile.rvn || 0) + 1;
-            profile.commandRevision = (profile.commandRevision || 0) + 1;
-            profile.updated = new Date().toISOString();
-
-            changes.push({ changeType: "fullProfileUpdate", profile });
-            break;
-          }
-
-          case "SetCosmeticLockerBanner": {
-            const body = await c.req.json<{
-              lockerItem: string;
-              bannerIconTemplateName: string;
-              bannerColorTemplateName: string;
-            }>();
-            const item = profile.items?.[body.lockerItem];
-            if (
-              !item ||
-              item.templateId.toLowerCase() !==
-                "cosmeticlocker:cosmeticlocker_athena"
-            )
-              return sendError(
-                c,
-                "errors.invalid_locker_item",
-                "Locker item invalid",
-                [],
-                400,
-                "invalid_locker_item",
-                400,
-              );
-
-            item.attributes.banner_icon_template = body.bannerIconTemplateName;
-            item.attributes.banner_color_template =
-              body.bannerColorTemplateName;
-            profile.stats.attributes.banner_icon = body.bannerIconTemplateName;
-            profile.stats.attributes.banner_color =
-              body.bannerColorTemplateName;
-
-            profile.items["Voltro-loadout"] = item;
-            await saveAthena(accountId, profile);
-
-            profile.rvn = (profile.rvn || 0) + 1;
-            profile.commandRevision = (profile.commandRevision || 0) + 1;
-            profile.updated = new Date().toISOString();
-            changes.push({ changeType: "fullProfileUpdate", profile });
-            break;
-          }
-
-          case "PutModularCosmeticLoadout": {
-            const body = await c.req.json<{
-              loadoutType: string;
-              presetId: number;
-              loadoutData: any;
-            }>();
-            if (!body.loadoutType || body.presetId == null || !body.loadoutData)
-              return sendError(
-                c,
-                "errors.voltronite.mcp.invalid_request",
-                "Missing fields",
-                [],
-                2023,
-                undefined,
-                400,
-              );
-
-            let loadoutData = body.loadoutData;
-            if (typeof loadoutData === "string")
-              loadoutData = JSON.parse(loadoutData);
-
-            profile.stats.attributes.loadout_presets ||= {};
-            profile.stats.attributes.loadout_presets[body.loadoutType] ||= {};
-            const presets =
-              profile.stats.attributes.loadout_presets[body.loadoutType];
-
-            let loadoutId = presets[body.presetId];
-            if (!loadoutId)
-              ((loadoutId = uuid().replace(/-/g, "")),
-                (presets[body.presetId] = loadoutId));
-
-            profile.items[loadoutId] = {
-              templateId: body.loadoutType,
-              attributes: loadoutData,
-              quantity: 1,
-            };
-            for (const slot of loadoutData.slots || []) {
-              if (!slot.equipped_item) continue;
-              const exists = Object.values(profile.items).some(
-                (item: any) =>
-                  item.templateId.toLowerCase() ===
-                  slot.equipped_item.toLowerCase(),
-              );
-              if (!exists)
-                profile.items[uuid().replace(/-/g, "")] = {
-                  templateId: slot.equipped_item,
-                  attributes: { variants: [] },
-                  quantity: 1,
-                };
-            }
-
-            profile.rvn = (profile.rvn || 0) + 1;
-            profile.commandRevision = (profile.commandRevision || 0) + 1;
-
-            await saveLoadout(accountId, profile);
-            changes.push({ changeType: "fullProfileUpdate", profile });
-            break;
-          }
-
-          case "EquipBattleRoyaleCustomization": {
-            const body = await c.req.json<{
-              itemToSlot: string;
-              slotName: string;
-              indexWithinSlot?: number;
-              variantUpdates?: { channel: string; active: string }[];
-            }>();
-
-            let statChanged = false;
-            let variantChanged = false;
-            if (body.variantUpdates?.length) {
-              const item = profile.items[body.itemToSlot];
-              if (
-                !item.attributes.variants ||
-                item.attributes.variants.length === 0
-              ) {
-                item.attributes.variants = body.variantUpdates;
-              } else {
-                for (let i = 0; i < item.attributes.variants.length; i++) {
-                  try {
-                    if (
-                      item.attributes.variants[i].channel.toLowerCase() ===
-                      body.variantUpdates[i]!.channel.toLowerCase()
-                    ) {
-                      item.attributes.variants[i].active =
-                        body.variantUpdates[i]!.active;
-                    }
-                  } catch {}
-                }
-              }
-              variantChanged = true;
-            }
-
-            const slot = body.slotName;
-            switch (slot) {
-              case "Character":
-              case "Backpack":
-              case "Pickaxe":
-              case "Glider":
-              case "SkyDiveContrail":
-              case "MusicPack":
-              case "LoadingScreen":
-                profile.stats.attributes[`favorite_${slot.toLowerCase()}`] =
-                  body.itemToSlot || "";
-                statChanged = true;
-                break;
-
-              case "Dance": {
-                const i = body.indexWithinSlot ?? 0;
-                if (i >= 0) {
-                  profile.stats.attributes.favorite_dance[i] =
-                    body.itemToSlot || "";
-                }
-                statChanged = true;
-                break;
-              }
-
-              case "ItemWrap": {
-                const i = body.indexWithinSlot ?? 0;
-                if (i >= 0) {
-                  profile.stats.attributes.favorite_itemwraps[i] =
-                    body.itemToSlot || "";
-                } else {
-                  for (let j = 0; j < 7; j++) {
-                    profile.stats.attributes.favorite_itemwraps[j] =
-                      body.itemToSlot || "";
-                  }
-                }
-                statChanged = true;
-                break;
-              }
-            }
-
-            if (statChanged) {
-              const category = `favorite_${slot.toLowerCase()}${
-                slot === "ItemWrap" ? "s" : ""
-              }`;
-
-              profile.rvn++;
-              profile.commandRevision++;
-
-              changes.push({
-                changeType: "statModified",
-                name: category,
-                value: profile.stats.attributes[category],
-              });
-
-              if (variantChanged) {
-                changes.push({
-                  changeType: "itemAttrChanged",
-                  itemId: body.itemToSlot,
-                  attributeName: "variants",
-                  attributeValue:
-                    profile.items[body.itemToSlot].attributes.variants,
-                });
-              }
-
-              await saveAthena(accountId, profile);
-            }
-
-            changes.push({ changeType: "fullProfileUpdate", profile });
-            break;
-          }
-
-          case "SetBattleRoyaleBanner": {
-            const body = await c.req.json<{
-              homebaseBannerIconId: string;
-              homebaseBannerColorId: string;
-            }>();
-
-            const icon = body.homebaseBannerIconId;
-            const color = body.homebaseBannerColorId;
-
-            profile.stats.attributes.banner_icon = icon;
-            profile.stats.attributes.banner_color = color;
-
-            profile.rvn = (profile.rvn || 0) + 1;
-            profile.commandRevision = (profile.commandRevision || 0) + 1;
-
-            await saveAthena(accountId, profile);
-            changes.push({ changeType: "fullProfileUpdate", profile });
-            break;
-          }
-
-          default:
-            return sendError(
-              c,
-              "errors.voltronite.mcp.operation_not_supported",
-              `Operation ${operation} not supported`,
-              [operation],
-              1931,
-              "invalid_operation",
-              400,
-            );
-        }
-
-        return c.json({
-          profileRevision: profile.rvn,
-          profileId,
-          profileChangesBaseRevision: parseInt(c.req.query("rvn") ?? "0"),
-          profileChanges: changes,
-          profileCommandRevision: profile.commandRevision,
-          serverTime: new Date().toISOString(),
-          responseVersion: 1,
-        });
-      } catch (err) {
-        Logger.error("[MCP] Internal Error: " + err);
-        return sendError(
-          c,
-          "errors.voltronite.internal_server_error",
-          "Internal Server Error",
-          [],
-          500,
-          "internal_error",
-          500,
-        );
-      }
-    },
+  profile.rvn = Math.max(
+    profile.rvn || 0,
+    athenaData.rvn || 0,
+    loadoutData.rvn || 0,
   );
-};
+  profile.commandRevision = Math.max(
+    profile.commandRevision || 0,
+    athenaData.commandRevision || 0,
+    loadoutData.commandRevision || 0,
+  );
+
+  return profile;
+}
+
+export async function saveAthena(accountId: string, profile: any) {
+  const accountDir = path.join(ATHENA_DIR, accountId);
+  await fs.mkdir(accountDir, { recursive: true });
+  const profilePath = path.join(accountDir, "athena.json");
+
+  const toSave = {
+    stats: profile.stats,
+    items: {
+      "Voltro-loadout": profile.items?.["Voltro-loadout"] || null,
+    },
+    rvn: profile.rvn,
+    commandRevision: profile.commandRevision,
+  };
+
+  await fs.writeFile(profilePath, JSON.stringify(toSave, null, 2), "utf8");
+}
+
+export async function saveLoadout(accountId: string, profile: any) {
+  const saveDir = path.join(ATHENA_DIR, accountId, "ch5");
+  await fs.mkdir(saveDir, { recursive: true });
+  const filePath = path.join(saveDir, "loadout.json");
+
+  const loadoutsToSave: Record<string, any> = {};
+
+  const presets = profile.stats.attributes.loadout_presets || {};
+  for (const type of Object.keys(presets)) {
+    for (const presetId of Object.keys(presets[type])) {
+      const loadoutId = presets[type][presetId];
+      if (profile.items[loadoutId]) {
+        loadoutsToSave[loadoutId] = profile.items[loadoutId];
+      }
+    }
+  }
+
+  const save = {
+    stats: {
+      attributes: {
+        loadout_presets: profile.stats.attributes.loadout_presets,
+      },
+    },
+    items: loadoutsToSave,
+    rvn: profile.rvn,
+    commandRevision: profile.commandRevision,
+  };
+
+  await fs.writeFile(filePath, JSON.stringify(save, null, 2), "utf8");
+}

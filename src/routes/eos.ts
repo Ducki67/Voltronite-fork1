@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { v4 as uuid } from "uuid";
 import sdk from "../../public/responses/sdk.json";
 import { decodeToken, encodeToken } from "../utils/tokens";
+import epicSettings from "../../public/responses/kws-shit.json";
 
 export default (app: Hono) => {
   app.get("/sdk/v1/*", (c) => c.json(sdk));
@@ -63,55 +64,11 @@ export default (app: Hono) => {
   });
 
   app.post("/telemetry/data/datarouter/api/v1/public/data", (c) =>
-    c.body(null, 204)
+    c.body(null, 204),
   );
 
   app.all("/v1/epic-settings/public/users/:accountId/values", (c) =>
-    c.json({
-      response: {
-        settings: [
-          {
-            namespace: "profile",
-            settingName: "allow-non-squad-users-to-see-my-username",
-            effectiveValue: true,
-            effectiveSource: "preference",
-            parentLimit: true,
-          },
-          {
-            namespace: "profile",
-            settingName: "can-see-player-usernames-from-other-squads",
-            effectiveValue: true,
-            effectiveSource: "preference",
-            parentLimit: true,
-          },
-          {
-            namespace: "chat",
-            settingName: "filter-out-mature-language",
-            effectiveValue: false,
-            effectiveSource: "preference",
-            parentLimit: false,
-          },
-          {
-            namespace: "chat",
-            settingName: "text",
-            effectiveValue: "everybody",
-            effectiveSource: "preference",
-            parentLimit: "everybody",
-          },
-          {
-            namespace: "chat",
-            settingName: "voice",
-            effectiveValue: "everybody",
-            effectiveSource: "preference",
-            parentLimit: "everybody",
-          },
-        ],
-      },
-      meta: {
-        requestId: "",
-        timestamp: new Date(),
-      },
-    })
+    c.json(epicSettings),
   );
 
   app.post("/publickey/*/publickey/", (c) => c.json([]));
@@ -123,7 +80,7 @@ export default (app: Hono) => {
       expires_at: "2069-01-01T00:00:00.000Z",
       client_id: "ec684b8c687f479fadea3cb2ad83f5c6",
       application_id: "fghi4567FNFBKFz3E4TROb0bmPS8h1GW",
-    })
+    }),
   );
 
   app.get("/epic/friends/v1/:accountId/blocklist", (c) => c.json([]));
