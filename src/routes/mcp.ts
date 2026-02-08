@@ -3,6 +3,7 @@ import { sendError } from "../utils/senderror";
 import { Logger } from "../utils/logger";
 import { handleAthena, saveAthena, saveLoadout } from "../utils/mcp";
 import { v4 as uuid } from "uuid";
+import { GetVersionInfo } from "../utils/funcs";
 
 export default (app: Hono) => {
   app.post(
@@ -11,6 +12,7 @@ export default (app: Hono) => {
       const accountId = c.req.param("accountId");
       const operation = c.req.param("operation");
       const profileId = c.req.query("profileId");
+      const verInfo = GetVersionInfo(c.req);
 
       if (!profileId)
         return sendError(
@@ -20,16 +22,25 @@ export default (app: Hono) => {
           [],
           400,
           "missing_profileId",
-          400
+          400,
         );
 
       let profile: any;
       const changes: any[] = [];
 
       try {
-        const profileModule = await import(
-          `../../public/profiles/${profileId}.json`
-        );
+        let profileModule;
+        if (profileId == "athena") {
+          profileModule =
+            verInfo.season <= 18
+              ? await import(`../../public/profiles/athena_old.json`)
+              : await import(`../../public/profiles/athena.json`);
+        } else {
+          profileModule = await import(
+            `../../public/profiles/${profileId}.json`
+          );
+        }
+
         const defaultProfile = profileModule.default;
         profile = await handleAthena(accountId, defaultProfile);
 
@@ -63,7 +74,7 @@ export default (app: Hono) => {
                 [],
                 400,
                 "invalid_request",
-                400
+                400,
               );
 
             const lockerItemObj = profile.items?.[body.lockerItem];
@@ -79,7 +90,7 @@ export default (app: Hono) => {
                 [],
                 400,
                 "invalid_locker_item",
-                400
+                400,
               );
 
             const slots = lockerItemObj.attributes.locker_slots_data.slots;
@@ -143,7 +154,7 @@ export default (app: Hono) => {
                 const arr = profile.stats.attributes[statName] || [];
                 if (body.slotIndex === -1)
                   itemToSlotValue = new Array(expectedCapacity).fill(
-                    body.itemToSlot || ""
+                    body.itemToSlot || "",
                   );
                 else {
                   const newArr = [...arr];
@@ -186,7 +197,7 @@ export default (app: Hono) => {
                 [],
                 400,
                 "invalid_locker_item",
-                400
+                400,
               );
 
             item.attributes.banner_icon_template = body.bannerIconTemplateName;
@@ -220,7 +231,7 @@ export default (app: Hono) => {
                 [],
                 2023,
                 undefined,
-                400
+                400,
               );
 
             let loadoutData = body.loadoutData;
@@ -247,7 +258,7 @@ export default (app: Hono) => {
               const exists = Object.values(profile.items).some(
                 (item: any) =>
                   item.templateId.toLowerCase() ===
-                  slot.equipped_item.toLowerCase()
+                  slot.equipped_item.toLowerCase(),
               );
               if (!exists)
                 profile.items[uuid().replace(/-/g, "")] = {
@@ -397,7 +408,7 @@ export default (app: Hono) => {
               [operation],
               1931,
               "invalid_operation",
-              400
+              400,
             );
         }
 
@@ -419,9 +430,9 @@ export default (app: Hono) => {
           [],
           500,
           "internal_error",
-          500
+          500,
         );
       }
-    }
+    },
   );
 };
