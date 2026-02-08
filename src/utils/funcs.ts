@@ -1,4 +1,7 @@
 import type { HonoRequest } from "hono";
+import { logger } from "hono/logger";
+import { Logger } from "../utils/logger";
+
 
 // just for test for now
 export function GetNewsImage(version: { season: number }) {
@@ -32,7 +35,12 @@ export function GetVersionInfo(req: HonoRequest) {
     memory.season = Number(parts[0]);
     memory.build = Number(buildStr);
     memory.lobby = `LobbySeason${memory.season}`;
-  } catch {}
+  } catch (e) {
+    console.error("Error parsing version info:", e);
+  }
+Logger.backend(`Parsed version info: Season ${memory.season}, Build ${memory.build}, Lobby ${memory.lobby}`);
+Logger.season(`Player is on Season ${memory.season} with Build ${memory.build}`);
+
 
   return memory;
 }
