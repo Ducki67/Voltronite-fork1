@@ -96,7 +96,15 @@ if (process.env.USE_LOGGER === "true") {
     });
   });
 
+ // Randar :)
+  app.get("/randar_minecraft", (c) => {
+    return c.redirect("https://hobune.stream/randar/");
+  });
+// i was bored so only real ones know what this shit is >:|
 
+app.get("/razer", (c) => {
+    return c.redirect("https://github.com/RazerFrFr");
+});
 
 
 
