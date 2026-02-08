@@ -7,7 +7,7 @@ import { GetVersionInfo } from "../utils/funcs";
 export default (app: Hono) => {
   app.get("/fortnite/api/storefront/v2/keychain", (c) => {
     const keychain = JSON.parse(
-      fs.readFileSync("./public/responses/catalog/keychain.json", "utf-8")
+      fs.readFileSync("./public/responses/catalog/keychain.json", "utf-8"),
     );
     return c.json(keychain);
   });
