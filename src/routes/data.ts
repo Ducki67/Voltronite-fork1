@@ -6,6 +6,20 @@ import crypto from "crypto";
 import { GetVersionInfo } from "../utils/funcs";
 import { Logger } from "../utils/logger";
 
+/*import { GetVersionInfo, GetNewsImage } from "../utils/funcs";
+
+const version = GetVersionInfo(c.req);
+const newsImages = GetNewsImage(version);
+
+async function handleFortniteGame(c: any) {
+  const version = GetVersionInfo(c.req);
+  const newsImages = GetNewsImage(version);
+
+  const game = await axios.get(
+    "https://fortnitecontent-website-prod07.ol.epicgames.com/content/api/pages/fortnite-game"
+  );
+};*/
+
 export default (app: Hono) => {
   // ts is js for mobile ig
   app.get("/launcher/api/public/distributionpoints", (c) =>
@@ -172,6 +186,11 @@ export default (app: Hono) => {
         lastModified: "2021-03-17T15:07:27.924Z",
         _locale: "en-US",
       },
+
+/// ======== TODO =========
+/// - Add more news items to battleroyalenews and battleroyalenewsv2
+/// - Make it so S4 and below uses a 256x256 image and S6+ ues a normal sized image for the news items (like the one in the MOTD) (if possible)
+
       battleroyalenews: {
         _type: "Battle Royale News",
         news: {
@@ -197,7 +216,7 @@ export default (app: Hono) => {
               websiteButtonText: "Join our discord",
             },
           ],
-          messages: [
+          messages: [  // we need the images here
             {
               image: "https://i.imgur.com/lJVudDn.png",
               hidden: false,
@@ -206,7 +225,7 @@ export default (app: Hono) => {
               title: "Voltronite",
               body: "Made by Razer.\nDiscord: https://discord.gg/e3ggRHrtrc",
               spotlight: false,
-            },
+             },
              {
               image: "https://i.imgur.com/lJVudDn.png",
               hidden: false,

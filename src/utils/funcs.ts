@@ -1,55 +1,37 @@
 import type { HonoRequest } from "hono";
 
-export function GetVersionInfo(req: HonoRequest): {
-  season: number;
-  build: number;
-  CL: string;
-  lobby: string;
-} {
+// just for test for now
+export function GetNewsImage(version: { season: number }) {
+  if (version.season <= 4) {
+    return {
+      image: "https://i.imgur.com/oCmiePS.png",
+      tileImage: "https://i.imgur.com/oCmiePS.png",
+    };
+  }
+// s5+ image (lager)
+  return {
+    image: "https://i.imgur.com/0SJtgwA.png",
+    tileImage: "https://i.imgur.com/0SJtgwA.png",
+  };
+}
+
+export function GetVersionInfo(req: HonoRequest) {
   const memory = {
     season: 0,
-    build: 0.0,
-    CL: "0",
+    build: 0,
+    CL: "",
     lobby: "",
   };
 
-  const userAgent = req.header("user-agent");
-  if (!userAgent) return memory;
-
-  let CL = "";
+  const ua = req.header("user-agent");
+  if (!ua) return memory;
 
   try {
-    let BuildID = userAgent.split("-")[3]?.split(",")[0];
-
-    if (BuildID && !Number.isNaN(Number(BuildID))) {
-      CL = BuildID;
-    } else {
-      BuildID = userAgent.split("-")[3]?.split(" ")[0];
-
-      if (BuildID && !Number.isNaN(Number(BuildID))) CL = BuildID;
-    }
-  } catch {
-    try {
-      let BuildID = userAgent.split("-")[1]?.split("+")[0];
-
-      if (BuildID && !Number.isNaN(Number(BuildID))) CL = BuildID;
-    } catch {}
-  }
-
-  try {
-    let Build = userAgent.split("Release-")[1]?.split("-")[0] ?? "";
-
-    if (Build.split(".").length === 3) {
-      const Value = Build.split(".");
-      Build = `${Value[0]}.${Value[1]}${Value[2]}`;
-    }
-
-    memory.season = Number(Build.split(".")[0]);
-    memory.build = Number(Build);
-    memory.CL = CL;
+    const buildStr = ua.split("Release-")[1]?.split("-")[0] ?? "";
+    const parts = buildStr.split(".");
+    memory.season = Number(parts[0]);
+    memory.build = Number(buildStr);
     memory.lobby = `LobbySeason${memory.season}`;
-
-    if (Number.isNaN(memory.season)) throw new Error();
   } catch {}
 
   return memory;
