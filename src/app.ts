@@ -46,6 +46,7 @@ if (process.env.USE_SETTINGS_PANNEL === 'true') {
 // log everything here!! Using  USE_LOGGER env var
 if (process.env.USE_LOGGER === "true") {
   app.use("*", logger());
+  console.log("Logger enabled!!");
   
   // simple root route for testing / showing backend infos (LATER)
   app.get("/", (c) => c.text(`Voltronite, Made by Razer! \n\n Other dev info at: http://localhost:${port}/devInfo \n Status at: http://localhost:${port}/status \n Ping at: http://localhost:${port}/ping  \n\n\n Warning: More nonsense coming soon...`));
