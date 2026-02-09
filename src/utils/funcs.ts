@@ -38,9 +38,11 @@ export function GetVersionInfo(req: HonoRequest) {
   } catch (e) {
     console.error("Error parsing version info:", e);
   }
+
+  if (process.env.USE_LOGGER === "true") {
 Logger.backend(`Parsed version info: Season ${memory.season}, Build ${memory.build}, Lobby ${memory.lobby}`);
 Logger.season(`Player is on Season ${memory.season} with Build ${memory.build}`);
-
+  }
 
   return memory;
 }
