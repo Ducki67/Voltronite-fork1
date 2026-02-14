@@ -18,7 +18,7 @@ async function handleFortniteGame(c: any) {
   const game = await axios.get(
     "https://fortnitecontent-website-prod07.ol.epicgames.com/content/api/pages/fortnite-game"
   );
-};*/
+};/**/
 
 export default (app: Hono) => {
   // ts is js for mobile ig
