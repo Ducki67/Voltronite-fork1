@@ -55,14 +55,8 @@ services, allowing connections on older versions of the game.
     Get any builds from [*here*](https://github.com/llamaqwerty/fortnite-builds-archive)
 2. **Use Erbium GameServer**\
     Make sure to use Erbium ot Other GS that supports your version(s)
-3. **Ip & port** (for each user)\
-    In lobby make sure to click on *Custom key* and type: **`127.0.0.1:7777`**. So **`IP:GsPort`**\
-    <img width="350" height="375" alt="image" src="https://github.com/user-attachments/assets/42e477df-4470-4e2e-9215-410020cf0578" /> \
-    After that click on *Accept* and start queing / MatchMaking to any gamemode. (it will depend on the GS and its playlist)\
-   **OR**\
- 5. *(optional)*  Change **`USE_CUSTOM_MATCHMAKING_CODE`** to **false** in the `.env` config file and atfer that the backend Will use the **`GAMESERVER_IP`** setting (currently set to: *127.0.0.1:7777*) when u matchmake so with this happens automaticly so you don't have to do **Step 3.** in this setup.
->[!NOTE]
-> This will NOT work past ch3s1 *i think* ALSO this can be bugged on seasons 15-16 i higly recomend doing this setup untill **Step 3** or just use it for builds that are S14 and below!!!
+3. **Launch A Fortnite build**\
+   The MM only works on 2.5 - 28.30. MM Support for <2.5 will be added in the future.
 
 Yay! you made it now you should get into your match :)
 
@@ -87,7 +81,7 @@ varying levels of stability and feature completeness:
 
 This project is licensed for **free personal and educational use only**.
 
-- ✅ You may use, modify, and run this backend for your own personal
+- ✅ You may u**se, modify, and run this backend for your own personal
   or educational purposes.
 - ❌ Commercial use, resale, or redistribution of this project is not
   permitted without explicit permission from the author.
