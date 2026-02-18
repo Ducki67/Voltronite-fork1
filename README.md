@@ -51,6 +51,8 @@ services, allowing connections on older versions of the game.
 
 ---
 ## How to set up matchmaking
+<details>
+
 1. **Load up a OG build**\
     Get any builds from [*here*](https://github.com/llamaqwerty/fortnite-builds-archive)
 2. **Use Erbium GameServer**\
@@ -59,6 +61,8 @@ services, allowing connections on older versions of the game.
    The MM only works on 2.5 - 28.30. MM Support for <2.5 will be added in the future.
 
 Yay! you made it now you should get into your match :)
+
+</details>
 
 ---
 ## 🛠️ Support & Compatibility
@@ -81,7 +85,7 @@ varying levels of stability and feature completeness:
 
 This project is licensed for **free personal and educational use only**.
 
-- ✅ You may u**se, modify, and run this backend for your own personal
+- ✅ You may use, modify, and run this backend for your own personal
   or educational purposes.
 - ❌ Commercial use, resale, or redistribution of this project is not
   permitted without explicit permission from the author.
