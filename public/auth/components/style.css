@@ -1,0 +1,206 @@
+/* Reset basic properties and build viewport canvas dimensions */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Burbank Big Condensed", "Arial Black", Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  background-color: #050d18;
+}
+
+/* LAYER 1: Deep Navy Blue Spotlight Vignette sitting behind your texture layer */
+.fortnite-vignette-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, #1b3d66 0%, #030812 100%);
+  z-index: -5;
+}
+
+/* BASE LAYER FOR KINETIC TEXTURES: Enlarged and positioned to blend out seam cuts */
+.fortnite-kinetic-grid {
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 140%;
+  height: 140%;
+  background-image: url('bg.png'); /* References your image directly from the folder */
+  background-size: cover;
+  background-position: center center;
+  mix-blend-mode: screen; /* Seamlessly dissolves dark color tones over your gradient backdrop */
+}
+
+/* PLANE 1: Primary Slow Geometric Drift (Large, slow movement mimicking client camera tracking) */
+.plane-one {
+  z-index: -4;
+  opacity: 0.35;
+  animation: landscapeDriftOne 55s ease-in-out infinite alternate;
+}
+
+/* PLANE 2: Secondary Counter-Pulse (Slightly staggered tracking to create parallax engine depth) */
+.plane-two {
+  z-index: -3;
+  opacity: 0.15;
+  filter: blur(1px); /* Creates the soft background focus drop-off from 2018 */
+  transform: scale(1.1) rotate(15deg);
+  animation: landscapeDriftTwo 40s ease-in-out infinite alternate;
+}
+
+/* 1:1 Accurate 2018 Kinetic Grid Motion Equations */
+@keyframes landscapeDriftOne {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate(3%, 2%) scale(1.04) rotate(1deg);
+    opacity: 0.45; /* Simulates the engine's organic ambient glow pulse */
+  }
+  100% {
+    transform: translate(-1%, -2%) scale(0.98) rotate(-0.5deg);
+    opacity: 0.25;
+  }
+}
+
+@keyframes landscapeDriftTwo {
+  0% {
+    transform: translate(0, 0) scale(1.1) rotate(15deg);
+    opacity: 0.1;
+  }
+  50% {
+    transform: translate(-2%, 3%) scale(1.15) rotate(13deg);
+    opacity: 0.22;
+  }
+  100% {
+    transform: translate(2%, -1%) scale(1.08) rotate(16deg);
+    opacity: 0.12;
+  }
+}
+
+/* UI Card Structure Units (z-index 2 forces layout plane forward safely) */
+.logo-container {
+  margin-bottom: 24px;
+  text-align: center;
+  z-index: 2;
+}
+
+.logo-container h1 {
+  font-size: 5.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+  margin: 0;
+  color: #ffffff;
+  font-style: italic;
+  transform: scaleY(1.15); 
+  text-shadow: 0px 4px 15px rgba(0, 0, 0, 0.45);
+}
+
+.container {
+  width: 100%;
+  max-width: 460px;
+  background-color: #12131a;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+  box-sizing: border-box;
+  z-index: 2;
+}
+
+.card-header {
+  padding: 24px 34px 20px 34px;
+  text-align: left;
+}
+
+.container h2 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin: 0;
+  text-transform: uppercase;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+.card-body {
+  padding: 0px 0px 34px 0px;
+  background-color: #4c526d;
+}
+
+.instruction-area {
+  background-color: #7b85ab;
+  padding: 10px 34px;
+  margin-bottom: 24px;
+}
+
+.instruction-text {
+  color: #1f3660;
+  font-size: 0.92rem;
+  font-weight: bold;
+  margin: 0;
+  font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+.input-wrapper {
+  padding: 0 34px;
+  box-sizing: border-box;
+}
+
+input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 14px;
+  background-color: #646b8a;
+  border: none;
+  color: #1a1a1a;
+  font-size: 1.05rem;
+  font-weight: bold;
+  font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+input::placeholder {
+  color: #494f66;
+  font-weight: bold;
+}
+
+input:focus {
+  outline: 2px solid #ffffff;
+  background-color: #6d7596;
+}
+
+.card-footer {
+  padding: 34px;
+  display: flex;
+  justify-content: center;
+  background-color: #12131a;
+}
+
+button {
+  background-color: #55627c;
+  border: 1px solid #333b4b;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 4px 10px rgba(0,0,0,0.3);
+  color: #ffffff;
+  padding: 8px 32px;
+  font-size: 1.15rem;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-family: "Burbank Big Condensed", "Arial Black", sans-serif;
+  transition: background-color 0.1s ease;
+}
+
+button:hover {
+  background-color: #61708d;
+}
+
+button:active {
+  background-color: #465166;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+}

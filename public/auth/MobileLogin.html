@@ -1,75 +1,49 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Voltronite</title>
-    <style>
-      body {
-        margin: 0;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background-color: #121212;
-        color: #fff;
-      }
-
-      .container {
-        background-color: #1f1f1f;
-        padding: 50px 40px;
-        border-radius: 12px;
-        width: 100%;
-        max-width: 360px;
-        text-align: center;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-      }
-
-      h1 {
-        margin-bottom: 30px;
-        font-weight: 600;
-        font-size: 24px;
-        color: #ffffff; /* White title */
-      }
-
-      input {
-        width: 100%; /* Full width to match button */
-        padding: 12px 15px;
-        margin-bottom: 20px;
-        border-radius: 8px;
-        border: none;
-        font-size: 16px;
-        background-color: #2a2a2a;
-        color: #fff;
-        box-sizing: border-box;
-      }
-
-      button {
-        width: 100%;
-        padding: 12px 0;
-        border: none;
-        border-radius: 8px;
-        background-color: #00aaff;
-        color: #fff;
-        font-size: 16px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-      }
-
-      button:active {
-        background-color: #0088cc;
-      }
-    </style>
+    <link rel="stylesheet" href="components/style.css" />
   </head>
   <body>
-    <div class="container">
-      <h1>Voltronite Login</h1>
-      <input type="text" id="username" placeholder="Enter your username" />
-      <button onclick="redirect()">Continue</button>
+
+    <!-- 1:1 Chapter 1 Dual-Plane Kinetic Drift Animation Backgrounds -->
+    <div class="fortnite-vignette-backdrop"></div>
+    <div class="fortnite-kinetic-grid plane-one"></div>
+    <div class="fortnite-kinetic-grid plane-two"></div>
+
+    <!-- Game Logo Header Section -->
+    <div class="logo-container">
+      <h1>Voltronite</h1>
     </div>
 
+    <!-- Main Content Container Box -->
+    <div class="container">
+      
+      <!-- Top Title block -->
+      <div class="card-header">
+        <h2>Log In</h2>
+      </div>
+
+      <!-- Input Block -->
+      <div class="card-body">
+        <div class="instruction-area">
+          <p class="instruction-text">Log in to your profile to continue!</p>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" id="username" placeholder="USERNAME" required />
+        </div>
+      </div>
+
+      <!-- Action Button Block -->
+      <div class="card-footer">
+        <button onclick="redirect()">Log In</button>
+      </div>
+
+    </div>
+
+    <!-- Operating custom redirect script -->
     <script>
       function redirect() {
         const username = document.getElementById("username").value.trim();
