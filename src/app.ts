@@ -96,14 +96,18 @@ if (process.env.USE_LOGGER === "true") {
     });
   });
 
-  // FortByte diagnostic: the patched game's Moonwave mirrors its UE4 log here so
-  // we can read crashes without adb / file-manager access to Android/data.
-  app.post("/fortbyte/log", async (c) => {
-    let body = "";
-    try { body = await c.req.text(); } catch {}
-    console.log("\x1b[35m========== [FORTBYTE GAME LOG] ==========\x1b[0m" + body + "\x1b[35m========== [END GAME LOG] ==========\x1b[0m");
-    return c.body(null, 204);
-  });
+  // FortByte UE-log capture: the patched game's Moonwave mirrors its Fortnite
+  // UE4 log here so we can read crashes/redirects without adb. Toggle with
+  // USE_UE_LOGGER (currently used by the FortByte launcher app).
+  if (process.env.USE_UE_LOGGER === "true") {
+    app.post("/fortbyte/log", async (c) => {
+      let body = "";
+      try { body = await c.req.text(); } catch {}
+      console.log("\x1b[35m========== [FORTBYTE GAME LOG] ==========\x1b[0m" + body + "\x1b[35m========== [END GAME LOG] ==========\x1b[0m");
+      return c.body(null, 204);
+    });
+    console.log("UE logger enabled!! — receiving Fortnite logs at /fortbyte/log");
+  }
 
  // Randar :)
   app.get("/randar_minecraft", (c) => {
