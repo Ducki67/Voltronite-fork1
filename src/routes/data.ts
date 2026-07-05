@@ -20,6 +20,33 @@ async function handleFortniteGame(c: any) {
   );
 };/**/
 
+// Each Android build bakes its OWN content-manifest name into assets/cloudcontent.json,
+// with the matching [<name>,Startup] sections living in its bundled BackgroundDownloads.ini.
+// From 10.31 (Party Hub) onward the game FATALS if the manifest we hand back doesn't match
+// that baked name ("Could not find config section for <name>,Startup"). Pre-10.31 builds
+// tolerate a mismatch, but we return the correct name for every build so the backend never
+// has to hand-swap clouddir manifest/chunk files per build again. Names extracted straight
+// from each APK's cloudcontent.json. AND IN THEORI this work
+const MANIFEST_BY_BUILD: Record<string, string> = {
+  "6.21": "_mJ9vy-k88CmsqnpFUS2biGNJFWdUQ.manifest",
+  "6.31": "I-bQuAF4vBQG5mBoe02P8Bz7jokG_w.manifest",
+  "8.51": "n2FarYo2ARlDiyv8Nk622gQwPh2T9A.manifest",
+  "9.10": "zmMBsccamXX4XtQOjkeFE0H1jclsJw.manifest",
+  "9.21": "7fOZ21NKAbv_KurL9E2SBRdeTgtTBg.manifest",
+  "9.41": "wZ4D2hNIjOonJ0-GiUq3ErH8eioeAw.manifest",
+  "10.0": "CV7e3AIKdYyWV3Cyeka1XHKmIQdCVA.manifest",
+  "10.31": "dKr4UIrFrY7ImyNyxECBN0iuodugrw.manifest",
+  "10.40": "qs3RSQRjdwo9spCS4EWR8-um9Q8Tww.manifest",
+  "13.40": "9O7dGkaFewI7qGElsE2rjSDu5u6jeg.manifest",
+  // 11.31 / 12.41 / 12.61 ship no cloudcontent.json (different content mechanism) — verify separately.
+};
+
+function manifestNameForReq(req: any): string {
+  const ua = req.header("user-agent") ?? "";
+  const buildStr = ua.split("Release-")[1]?.split("-")[0] ?? "";
+  return MANIFEST_BY_BUILD[buildStr] ?? "LawinServer.manifest";
+}
+
 export default (app: Hono) => {
   // ts is js for mobile ig
   app.get("/launcher/api/public/distributionpoints", (c) =>
@@ -49,26 +76,12 @@ export default (app: Hono) => {
   app.get(
     "/launcher/api/public/assets/:platform/:catalogItemId/:appName",
     (c) => {
-      const platform = c.req.param("platform");
-      if (platform !== "Android") {
-        return c.json({
-          appName: c.req.param("appName"),
-          labelName: c.req.query("label"),
-          buildVersion: "Voltronite",
-          catalogItemId: c.req.param("catalogItemId"),
-          expires: "9999-12-31T23:59:59.999Z",
-          items: {
-            MANIFEST: {
-              signature: "Voltronite",
-              distribution: "https://voltronite.ol.epicgames.com/",
-              path: "Builds/Fortnite/Content/CloudDir/LawinServer.manifest",
-              additionalDistributions: [],
-            },
-          },
-          assetId: c.req.param("appName"),
-        });
-      }
-
+      // Hand back the manifest name THIS build baked into its own cloudcontent.json /
+      // BackgroundDownloads.ini. distribution stays on *.epicgames.com so Moonwave
+      // redirects the download to Voltronite, which serves the stub manifest bytes for
+      // any filename. The name is what matters: it must match the game's bundled
+      // [<name>,Startup] section (fatal from 10.31 up). No more per-build file swapping.
+      const manifestName = manifestNameForReq(c.req);
       return c.json({
         appName: c.req.param("appName"),
         labelName: c.req.query("label"),
@@ -78,12 +91,13 @@ export default (app: Hono) => {
         items: {
           MANIFEST: {
             signature: "Voltronite",
-            distribution: "https://voltronite.ol.epicgames.com/", // redirected (*.epicgames.com) → the game downloads clouddir/manifest.manifest from Voltronite; its embedded AppName is LawinServer.manifest, which matches the [LawinServer.manifest,Startup] section in Full.ini
-            path: "Builds/Fortnite/Content/CloudDir/LawinServer.manifest",
+            distribution: "https://voltronite.ol.epicgames.com/",
+            path: `Builds/Fortnite/Content/CloudDir/${manifestName}`,
             additionalDistributions: [],
           },
         },
         assetId: c.req.param("appName"),
+        platform: c.req.param("platform"),
       });
     }
   );
@@ -100,8 +114,15 @@ export default (app: Hono) => {
   });
 
   app.get("/Builds/Fortnite/Content/CloudDir/manifest/:file.ini", async (c) => {
+    // The install-bundle ini lists each bundle's [<manifest>,<Tag>] download size.
+    // Its section prefix must match the manifest name we handed this build in appAssets,
+    // or the game can't find [<name>,Startup]. The stub is authored for LawinServer.manifest
+    // (all sizes 0); rewrite the prefix to the requesting build's real manifest name so the
+    // Startup section resolves (size 0 → nothing to download → boot from the bundled OBB).
     const filePath = "./public/clouddir/Full.ini";
-    const data = await fs.promises.readFile(filePath);
+    const raw = await fs.promises.readFile(filePath, "utf8");
+    const manifestName = manifestNameForReq(c.req);
+    const data = raw.replaceAll("LawinServer.manifest", manifestName);
 
     return new Response(data, {
       headers: {
