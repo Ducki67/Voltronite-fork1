@@ -25,7 +25,6 @@ export default (app: Hono) => {
   app.get("/launcher/api/public/distributionpoints", (c) =>
     c.json({
       distributions: [
-        "https://epicgames-download1.akamaized.net/",
         "https://download.epicgames.com/",
         "https://download2.epicgames.com/",
         "https://download3.epicgames.com/",
@@ -38,7 +37,6 @@ export default (app: Hono) => {
   app.get("/launcher/api/public/distributionpoints/", (c) =>
     c.json({
       distributions: [
-        "https://epicgames-download1.akamaized.net/",
         "https://download.epicgames.com/",
         "https://download2.epicgames.com/",
         "https://download3.epicgames.com/",
@@ -63,7 +61,7 @@ export default (app: Hono) => {
             MANIFEST: {
               signature: "Voltronite",
               distribution: "https://voltronite.ol.epicgames.com/",
-              path: "Builds/Fortnite/Content/CloudDir/manifest.manifest",
+              path: "Builds/Fortnite/Content/CloudDir/LawinServer.manifest",
               additionalDistributions: [],
             },
           },
@@ -80,8 +78,8 @@ export default (app: Hono) => {
         items: {
           MANIFEST: {
             signature: "Voltronite",
-            distribution: "https://epicgames-download1.akamaized.net/",
-            path: "Builds/Fortnite/Content/CloudDir/9O7dGkaFewI7qGElsE2rjSDu5u6jeg.manifest", // real manifest (from Razer's working FrostbiteV2) — downloaded from Epic's live CDN (not redirected)
+            distribution: "https://voltronite.ol.epicgames.com/", // redirected (*.epicgames.com) → the game downloads clouddir/manifest.manifest from Voltronite; its embedded AppName is LawinServer.manifest, which matches the [LawinServer.manifest,Startup] section in Full.ini
+            path: "Builds/Fortnite/Content/CloudDir/LawinServer.manifest",
             additionalDistributions: [],
           },
         },

@@ -103,7 +103,15 @@ if (process.env.USE_LOGGER === "true") {
     app.post("/fortbyte/log", async (c) => {
       let body = "";
       try { body = await c.req.text(); } catch {}
-      console.log("\x1b[35m========== [FORTBYTE GAME LOG] ==========\x1b[0m" + body + "\x1b[35m========== [END GAME LOG] ==========\x1b[0m");
+      // The UE4 log is mostly MCP config spam that buries + truncates the real
+      // failure. Surface only crash-relevant lines (UE4 dumps the whole crash
+      // under "LogAndroid: Error").
+      const crash = body.split("\n").filter((l) =>
+        /LogAndroid: Error|Fatal error|Critical error|Assertion failed|SIGSEGV|SIGABRT|Signal 1[12]/i.test(l)
+      );
+      if (crash.length) {
+        console.log("\x1b[31m===== [FORTBYTE CRASH] =====\n" + crash.join("\n") + "\n===== [END CRASH] =====\x1b[0m");
+      }
       return c.body(null, 204);
     });
     console.log("UE logger enabled!! — receiving Fortnite logs at /fortbyte/log");
