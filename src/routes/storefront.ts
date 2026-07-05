@@ -11,7 +11,7 @@ export default (app: Hono) => {
     );
     return c.json(keychain);
   });
-
+/*
   app.get("/fortnite/api/storefront/v2/catalog", async (c) => {
     const version = GetVersionInfo(c.req).build;
 
@@ -20,7 +20,7 @@ export default (app: Hono) => {
     } else {
       return c.json(v1);
     }
-  });
+  });*/
 
   app.get("/catalog/api/shared/bulk/offers", (c) => c.json({}));
 };
