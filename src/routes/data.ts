@@ -81,7 +81,7 @@ export default (app: Hono) => {
           MANIFEST: {
             signature: "Voltronite",
             distribution: "https://epicgames-download1.akamaized.net/",
-            path: "Builds/Fortnite/Content/CloudDir/s3Z2Diebae5FbF5cHUqo1-SsTk_FzQ.manifest", // replace *.manifest with a valid manifest (e.g: RxwT9fhXyJWzLl0WXky5X98eJx9XfQ.manifest)
+            path: "Builds/Fortnite/Content/CloudDir/9O7dGkaFewI7qGElsE2rjSDu5u6jeg.manifest", // real manifest (from Razer's working FrostbiteV2) — downloaded from Epic's live CDN (not redirected)
             additionalDistributions: [],
           },
         },

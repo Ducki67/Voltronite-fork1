@@ -96,6 +96,15 @@ if (process.env.USE_LOGGER === "true") {
     });
   });
 
+  // FortByte diagnostic: the patched game's Moonwave mirrors its UE4 log here so
+  // we can read crashes without adb / file-manager access to Android/data.
+  app.post("/fortbyte/log", async (c) => {
+    let body = "";
+    try { body = await c.req.text(); } catch {}
+    console.log("\x1b[35m========== [FORTBYTE GAME LOG] ==========\x1b[0m" + body + "\x1b[35m========== [END GAME LOG] ==========\x1b[0m");
+    return c.body(null, 204);
+  });
+
  // Randar :)
   app.get("/randar_minecraft", (c) => {
     return c.redirect("https://hobune.stream/randar/");
