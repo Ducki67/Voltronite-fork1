@@ -107,10 +107,10 @@ if (process.env.USE_LOGGER === "true") {
       // failure. Surface only crash-relevant lines (UE4 dumps the whole crash
       // under "LogAndroid: Error").
       const crash = body.split("\n").filter((l) =>
-        /LogAndroid: Error|Fatal error|Critical error|Assertion failed|SIGSEGV|SIGABRT|Signal 1[12]/i.test(l)
+        /LogAndroid: Error|Fatal error|Critical error|Assertion|SIGSEGV|SIGABRT|Signal 1[12]|abort\(\)|NavigateToMode|WebError|FortLoadingScreen|Fire Init Analytic|LogXmpp|no_connection|out of memory|LowMemory|Received signal|ClientFatal|Hitch/i.test(l)
       );
       if (crash.length) {
-        console.log("\x1b[31m===== [FORTBYTE CRASH] =====\n" + crash.join("\n") + "\n===== [END CRASH] =====\x1b[0m");
+        console.log("\x1b[31m===== [FORTBYTE TRACE] =====\n" + crash.join("\n") + "\n===== [END TRACE] =====\x1b[0m");
       }
       return c.body(null, 204);
     });
