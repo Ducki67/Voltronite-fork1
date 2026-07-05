@@ -5,21 +5,26 @@ services, allowing connections on older versions of the game.
 
 ## Personal changes made by Me
 <details>
+
 <headder> Admin/Settings pannel (under the works) </headder> <br>
- - Config changing <br>
- - Login system <br>
- - Backend controllers: Restart, Shutdown
+- Config changing <br>
+- Login system <br>
+- Backend controllers: Restart, Shutdown
+
 </br>
 
 <headder2> MatchMaking / Matchmaker
 </headder2> <br>
+- Mobile MM fixed (tested on 7.40)
+
+</br>
 
 <headder3> Mobile stuff (Android tested)</headder3> <br>
 - UE Log mirror System (uses its from Moonwave redirect)
 - some manifest shit
 </br>
 
- - not done fully
+ - some more coming ig  for now (since im testing stuff on Android)
 
 </details>
     
