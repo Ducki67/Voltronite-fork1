@@ -13,6 +13,12 @@ services, allowing connections on older versions of the game.
 
 <headder2> MatchMaking / Matchmaker
 </headder2> <br>
+
+<headder3> Mobile stuff (Android tested)</headder3> <br>
+- UE Log mirror System (uses its from Moonwave redirect)
+- some manifest shit
+</br>
+
  - not done fully
 
 </details>
